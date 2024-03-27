@@ -15,12 +15,14 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.tempstay.tempstay.Models.LoginModel;
+import com.tempstay.tempstay.Models.PriceHotelType;
 import com.tempstay.tempstay.Models.ResponseMessage;
 import com.tempstay.tempstay.Models.ServiceProviderModel;
 import com.tempstay.tempstay.RatingService.HotelRating;
 import com.tempstay.tempstay.Repository.ServiceProviderRepository;
 import com.tempstay.tempstay.SearchFunction.SearchByAddressAndHotelName;
 import com.tempstay.tempstay.ServiceProviderServices.ServiceProviderUpdate;
+import com.tempstay.tempstay.ServiceProviderServices.UploadHotelService;
 import com.tempstay.tempstay.UserServices.UserService;
 
 import jakarta.validation.Valid;
@@ -44,6 +46,10 @@ public class MainController {
 
     @Autowired
     private HotelRating playgroundRating;
+
+    @Autowired
+    private UploadHotelService uploadHotelService;
+
 
     
    
@@ -97,15 +103,21 @@ public class MainController {
     }
 
     @GetMapping("getdetailsby")
-    public Optional<ServiceProviderModel> getDetailsByHoId(@RequestHeader String HotelownId) {
-        return serviceProviderRepository.findById(UUID.fromString(HotelownId));
+    public Optional<ServiceProviderModel> getDetailsByHoId(@RequestHeader String hotelownId) {
+        return serviceProviderRepository.findById(UUID.fromString(hotelownId));
     }
 
     @PostMapping("addrating")
-    public ResponseEntity<ResponseMessage> rating(@RequestHeader String HotelownId, @RequestHeader float rating) {
-        return playgroundRating.AvgHotelRating(HotelownId, rating);
+    public ResponseEntity<ResponseMessage> rating(@RequestHeader String hotelownId, @RequestHeader float rating) {
+        return playgroundRating.AvgHotelRating(hotelownId, rating);
+
+       
     }
 
   
-   
+    @PostMapping("uploadhotels")
+        public ResponseEntity<ResponseMessage> uploadHotels(@RequestHeader String token, @RequestHeader String role,
+                @RequestBody List<PriceHotelType> pricePerType) {
+            return uploadHotelService.uploadHotelsInfoService(pricePerType, token, role);
+}
 }

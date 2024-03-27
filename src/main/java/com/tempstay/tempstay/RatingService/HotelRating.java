@@ -22,7 +22,7 @@ public class HotelRating {
     @Autowired
     private ResponseMessage responseMessage;
 
-    public ResponseEntity<ResponseMessage> AvgHotelRating(String HotelownId, float rating) {
+    public ResponseEntity<ResponseMessage> AvgHotelRating(String hotelownId, float rating) {
         try {
             if (rating > 5 || rating < 0) {
                 responseMessage.setSuccess(false);
@@ -30,7 +30,7 @@ public class HotelRating {
                 return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(responseMessage);
             } else {
                 Optional<ServiceProviderModel> serviceProviderOptional = serviceProviderRepository
-                        .findById(UUID.fromString(HotelownId));
+                        .findById(UUID.fromString(hotelownId));
 
                 if (serviceProviderOptional.isPresent()) {
                     ServiceProviderModel serviceProvider = serviceProviderOptional.get();
@@ -54,7 +54,7 @@ public class HotelRating {
                                     "Rating added and number of ratings are: " + serviceProvider.getNumberOfRatings());
                 } else {
                     responseMessage.setSuccess(false);
-                    responseMessage.setMessage("Invalid HotelownId");
+                    responseMessage.setMessage("Invalid hotelownId");
                     return ResponseEntity.badRequest().body(responseMessage);
                 }
 
