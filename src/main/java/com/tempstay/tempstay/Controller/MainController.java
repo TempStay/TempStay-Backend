@@ -22,11 +22,13 @@ import com.tempstay.tempstay.Models.PriceHotelType;
 import com.tempstay.tempstay.Models.ResponseMessage;
 import com.tempstay.tempstay.Models.ServiceProviderModel;
 import com.tempstay.tempstay.RatingService.HotelRating;
+import com.tempstay.tempstay.Repository.HotelDBRepo;
 import com.tempstay.tempstay.Repository.ServiceProviderRepository;
 import com.tempstay.tempstay.SearchFunction.SearchByAddressAndHotelName;
 import com.tempstay.tempstay.ServiceProviderServices.ServiceProviderUpdate;
 import com.tempstay.tempstay.ServiceProviderServices.UpdateHotelDetails;
 import com.tempstay.tempstay.ServiceProviderServices.UploadHotelService;
+import com.tempstay.tempstay.UserServices.AuthService;
 import com.tempstay.tempstay.UserServices.UserService;
 
 import jakarta.validation.Valid;
@@ -56,6 +58,12 @@ public class MainController {
    
     @Autowired
     private UpdateHotelDetails updateHotelDetials;
+
+    @Autowired
+    private AuthService authService;
+    
+    @Autowired
+    private HotelDBRepo hotelDBRepo;
 
     @PostMapping("adduser")
     public ResponseEntity<Object> addUser(@Valid @RequestBody Object userOrService, BindingResult bindingResult,
@@ -127,5 +135,11 @@ public class MainController {
     public ResponseEntity<ResponseMessage> updateSportDetails(@RequestBody HotelsDB latesthotelDetails) {
         return updateHotelDetials.updateHotelDetailsService(latesthotelDetails);
     }
-
+    @GetMapping("getdetails")
+    public HotelsDB getSPDetaills(@RequestHeader String token, @RequestHeader String role) {
+      String email=authService.verifyToken(token);
+      HotelsDB entityOptional = hotelDBRepo.findByemail(email);
+      return entityOptional;
+      
+    }
 }
