@@ -1,4 +1,5 @@
 package com.tempstay.tempstay.Controller;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.tempstay.tempstay.Models.HotelsDB;
 import com.tempstay.tempstay.Models.LoginModel;
 import com.tempstay.tempstay.Models.PriceHotelType;
 import com.tempstay.tempstay.Models.ResponseMessage;
@@ -22,6 +25,7 @@ import com.tempstay.tempstay.RatingService.HotelRating;
 import com.tempstay.tempstay.Repository.ServiceProviderRepository;
 import com.tempstay.tempstay.SearchFunction.SearchByAddressAndHotelName;
 import com.tempstay.tempstay.ServiceProviderServices.ServiceProviderUpdate;
+import com.tempstay.tempstay.ServiceProviderServices.UpdateHotelDetails;
 import com.tempstay.tempstay.ServiceProviderServices.UploadHotelService;
 import com.tempstay.tempstay.UserServices.UserService;
 
@@ -29,14 +33,14 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("api")
-@CrossOrigin(origins="http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5173")
 public class MainController {
 
     @Autowired
     private UserService userService;
 
     @Autowired
-    private ServiceProviderUpdate serviceProviderUpdate ;
+    private ServiceProviderUpdate serviceProviderUpdate;
 
     @Autowired
     private SearchByAddressAndHotelName searchByAddressAndHotelName;
@@ -49,10 +53,10 @@ public class MainController {
 
     @Autowired
     private UploadHotelService uploadHotelService;
-
-
-    
    
+    @Autowired
+    private UpdateHotelDetails updateHotelDetials;
+
     @PostMapping("adduser")
     public ResponseEntity<Object> addUser(@Valid @RequestBody Object userOrService, BindingResult bindingResult,
             @RequestHeader String role) {
@@ -111,13 +115,17 @@ public class MainController {
     public ResponseEntity<ResponseMessage> rating(@RequestHeader String hotelownId, @RequestHeader float rating) {
         return playgroundRating.AvgHotelRating(hotelownId, rating);
 
-       
     }
 
-  
     @PostMapping("uploadhotels")
-        public ResponseEntity<ResponseMessage> uploadHotels(@RequestHeader String token, @RequestHeader String role,
-                @RequestBody List<PriceHotelType> pricePerType) {
-            return uploadHotelService.uploadHotelsInfoService(pricePerType, token, role);
-}
+    public ResponseEntity<ResponseMessage> uploadHotels(@RequestHeader String token, @RequestHeader String role,
+            @RequestBody List<PriceHotelType> pricePerType) {
+        return uploadHotelService.uploadHotelsInfoService(pricePerType, token, role);
+    }
+
+    @PutMapping("updatehoteldetails")
+    public ResponseEntity<ResponseMessage> updateSportDetails(@RequestBody HotelsDB latesthotelDetails) {
+        return updateHotelDetials.updateHotelDetailsService(latesthotelDetails);
+    }
+
 }
