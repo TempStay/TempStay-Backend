@@ -33,6 +33,7 @@ import com.tempstay.tempstay.UserServices.UserService;
 
 import jakarta.validation.Valid;
 
+
 @RestController
 @RequestMapping("api")
 @CrossOrigin(origins = "http://localhost:5173")
@@ -55,16 +56,18 @@ public class MainController {
 
     @Autowired
     private UploadHotelService uploadHotelService;
-   
+
     @Autowired
     private UpdateHotelDetails updateHotelDetials;
 
     @Autowired
     private AuthService authService;
-    
+
     @Autowired
     private HotelDBRepo hotelDBRepo;
 
+   
+   
     @PostMapping("adduser")
     public ResponseEntity<Object> addUser(@Valid @RequestBody Object userOrService, BindingResult bindingResult,
             @RequestHeader String role) {
@@ -132,14 +135,19 @@ public class MainController {
     }
 
     @PutMapping("updatehoteldetails")
-    public ResponseEntity<ResponseMessage> updateSportDetails(@RequestBody HotelsDB latesthotelDetails) {
-        return updateHotelDetials.updateHotelDetailsService(latesthotelDetails);
+    public ResponseEntity<ResponseMessage> updateSportDetails(@RequestBody PriceHotelType latesthotelDetails,
+            @RequestHeader UUID roomId) {
+        return updateHotelDetials.updateHotelDetailsService(latesthotelDetails, roomId);
     }
+
     @GetMapping("getdetails")
-    public HotelsDB getSPDetaills(@RequestHeader String token, @RequestHeader String role) {
-      String email=authService.verifyToken(token);
-      HotelsDB entityOptional = hotelDBRepo.findByemail(email);
-      return entityOptional;
-      
+    public List<HotelsDB> getSPDetails(@RequestHeader String token, @RequestHeader String role) {
+        String email = authService.verifyToken(token);
+        List<HotelsDB> hotels = hotelDBRepo.findByEmail(email);
+        return hotels;
+
     }
+
+ 
+    
 }

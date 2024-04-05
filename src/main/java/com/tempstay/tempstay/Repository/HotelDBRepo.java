@@ -11,10 +11,10 @@ import com.tempstay.tempstay.Models.HotelsDB;
 import jakarta.transaction.Transactional;
 
 public interface HotelDBRepo extends JpaRepository<HotelsDB, UUID> {
-    List<HotelsDB> findByhotelownId(UUID hotelownId);
-    HotelsDB findByroomType(String roomType);
-    HotelsDB findByemail(String email);
-
+    List<HotelsDB> findByHotelownId(UUID hotelownId);
+    HotelsDB findByRoomType(String roomType);
+    List<HotelsDB> findByEmail(String email);
+    HotelsDB findByRoomId(UUID roomId);
 
     @Transactional
     @Query(value = "SELECT * FROM hotels_db WHERE hotelown_id=:hotelownId AND room_id=:roomId",nativeQuery = true)
@@ -25,6 +25,6 @@ public interface HotelDBRepo extends JpaRepository<HotelsDB, UUID> {
     // List<HotelsDB> findBySearch(String searchItem);
 
     @Transactional
-    @Query(value = "SELECT * FROM hotels_db WHERE hotelown_id=:hotelownId AND roomType =:roomType",nativeQuery = true)
+    @Query(value = "SELECT * FROM hotels_db WHERE hotelown_id=:hotelownId AND room_type =:roomType",nativeQuery = true)
     HotelsDB findByHotelownIdAndRoomType(@Param("hotelownId") UUID hotelownId , @Param("roomType") String roomType);
 }

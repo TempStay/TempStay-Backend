@@ -12,6 +12,7 @@ import com.tempstay.tempstay.Models.HotelsDB;
 import com.tempstay.tempstay.Models.PriceHotelType;
 import com.tempstay.tempstay.Models.ResponseMessage;
 import com.tempstay.tempstay.Repository.HotelDBRepo;
+import com.tempstay.tempstay.Repository.ServiceProviderRepository;
 import com.tempstay.tempstay.UserServices.AuthService;
 
 @Service
@@ -26,12 +27,15 @@ public class UploadHotelService {
     @Autowired
     private AuthService authservice;
 
+    @Autowired
+    private ServiceProviderRepository serviceProviderRepository;
+
     public ResponseEntity<ResponseMessage> uploadHotelsInfoService(List<PriceHotelType> pricePerType, String token,
             String role) {
         // return ResponseEntity.ok().body(responseMessage);
         try {
             String email = authservice.verifyToken(token);
-            String hotelownID = hotelDBRepo.findByemail(email).getHotelownId().toString();
+            String hotelownID = serviceProviderRepository.findByEmail(email).getId().toString();
             String duplicatesMessage = "";
 
             for (int i = 0; i < pricePerType.size(); i++) {
@@ -44,10 +48,11 @@ public class UploadHotelService {
                     hotelsdb.setRoomType(pricePerType.get(i).getRoom());
                     hotelsdb.setPricePerDay(pricePerType.get(i).getPrice());
                     hotelsdb.setNumberOfRooms(pricePerType.get(i).getNumberOfRoom());
+                    hotelsdb.setEmail(email);
                     hotelDBRepo.save(hotelsdb);
 
                 } else {
-                    duplicatesMessage += hotelDBRepo.findByroomType(pricePerType.get(i).getRoom());
+                    duplicatesMessage += hotelDBRepo.findByRoomType(pricePerType.get(i).getRoom());
                     duplicatesMessage += ", ";
                 }
             }
