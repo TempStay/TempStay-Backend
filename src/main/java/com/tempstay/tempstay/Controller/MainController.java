@@ -16,12 +16,14 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.tempstay.tempstay.Models.BookRoomHOModel;
 import com.tempstay.tempstay.Models.HotelsDB;
 import com.tempstay.tempstay.Models.LoginModel;
 import com.tempstay.tempstay.Models.PriceHotelType;
 import com.tempstay.tempstay.Models.ResponseMessage;
 import com.tempstay.tempstay.Models.ServiceProviderModel;
 import com.tempstay.tempstay.RatingService.HotelRating;
+import com.tempstay.tempstay.Repository.BookRoomRepo;
 import com.tempstay.tempstay.Repository.HotelDBRepo;
 import com.tempstay.tempstay.Repository.ServiceProviderRepository;
 import com.tempstay.tempstay.SearchFunction.SearchByAddressAndHotelName;
@@ -29,9 +31,12 @@ import com.tempstay.tempstay.ServiceProviderServices.ServiceProviderUpdate;
 import com.tempstay.tempstay.ServiceProviderServices.UpdateHotelDetails;
 import com.tempstay.tempstay.ServiceProviderServices.UploadHotelService;
 import com.tempstay.tempstay.UserServices.AuthService;
+import com.tempstay.tempstay.UserServices.BookRoomService;
 import com.tempstay.tempstay.UserServices.UserService;
 
 import jakarta.validation.Valid;
+
+
 
 
 @RestController
@@ -52,7 +57,7 @@ public class MainController {
     private ServiceProviderRepository serviceProviderRepository;
 
     @Autowired
-    private HotelRating playgroundRating;
+    private HotelRating hotelRating;
 
     @Autowired
     private UploadHotelService uploadHotelService;
@@ -65,6 +70,12 @@ public class MainController {
 
     @Autowired
     private HotelDBRepo hotelDBRepo;
+
+    @Autowired
+    private BookRoomService bookRoomService;
+    
+    @Autowired
+    private BookRoomRepo bookRoomRepo;
 
    
    
@@ -124,7 +135,7 @@ public class MainController {
 
     @PostMapping("addrating")
     public ResponseEntity<ResponseMessage> rating(@RequestHeader String hotelownId, @RequestHeader float rating) {
-        return playgroundRating.AvgHotelRating(hotelownId, rating);
+        return hotelRating.AvgHotelRating(hotelownId, rating);
 
     }
 
@@ -147,7 +158,27 @@ public class MainController {
         return hotels;
 
     }
+    @PostMapping("bookroom")
+    public ResponseEntity<ResponseMessage> bookRoomtByUser(@RequestBody BookRoomHOModel bookRoomHOModel,
+            @RequestHeader String token, @RequestHeader String role) {
+        return bookRoomService.userRoomBookService(bookRoomHOModel, token, role);
+    }
 
+ @PostMapping("checkroom")
+ public ResponseEntity<ResponseMessage> checkingfunc(@RequestBody  BookRoomHOModel bookRoomHOModelReq ) {
+     
+     
+     return bookRoomService.checkRoom(bookRoomHOModelReq.getHotelownId(),
+     bookRoomHOModelReq.getCheckinDate(), bookRoomHOModelReq.getCheckoutDate(),
+     bookRoomHOModelReq.getRoomId(),
+     bookRoomHOModelReq.getRoomNo());
+ }
+ 
+ @GetMapping("userbookingdetails")
+ public BookRoomHOModel userbookingdetails(@RequestHeader String token,@RequestHeader String role,@RequestHeader UUID roomBookingId) {
+    BookRoomHOModel ob=bookRoomRepo.findByRoomBookingId(roomBookingId);
+    return ob;
+ }
  
     
 }

@@ -25,7 +25,7 @@ public class UploadHotelService {
     private HotelDBRepo hotelDBRepo;
 
     @Autowired
-    private AuthService authservice;
+    private AuthService authService;
 
     @Autowired
     private ServiceProviderRepository serviceProviderRepository;
@@ -34,7 +34,7 @@ public class UploadHotelService {
             String role) {
         // return ResponseEntity.ok().body(responseMessage);
         try {
-            String email = authservice.verifyToken(token);
+            String email = authService.verifyToken(token);
             String hotelownID = serviceProviderRepository.findByEmail(email).getId().toString();
             String duplicatesMessage = "";
 
