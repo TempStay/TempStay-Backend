@@ -63,50 +63,59 @@ public class BookRoomService {
                     bookRoomHOModelReq.getCheckinDate(), bookRoomHOModelReq.getCheckoutDate(),
                     bookRoomHOModelReq.getRoomId(),
                     bookRoomHOModelReq.getRoomNo());
-            
-                    if (messageFromCheckRoom.getBody().getSuccess()) {
-               
+
+            if (messageFromCheckRoom.getBody().getSuccess()) {
+
                 BookRoomHOModel bookRoomHOModel = new BookRoomHOModel();
-               
+
                 bookRoomHOModel.setHotelownId(bookRoomHOModelReq.getHotelownId());
-               
-                String email=authService.verifyToken(token);
-                
-                UserModel user=userRepository.findByEmail(email);
-                
+
+                String email = authService.verifyToken(token);
+
+                UserModel user = userRepository.findByEmail(email);
+
                 bookRoomHOModel.setUserId(user.getId());
- 
+
                 bookRoomHOModel.setHotelownId((bookRoomHOModelReq.getHotelownId()));
 
                 bookRoomHOModel.setCheckinDate(bookRoomHOModelReq.getCheckinDate());
 
-                bookRoomHOModel.setRoomId(bookRoomHOModelReq.getRoomId());
+                bookRoomHOModel.setRoomId(bookRoomHOModelReq.getRoomId());               
 
-                bookRoomHOModel.setRoomNo(bookRoomHOModelReq.getRoomNo());
-                
                 bookRoomHOModel.setCheckoutDate(bookRoomHOModelReq.getCheckoutDate());
 
-                bookRoomHOModel.setNumberOfDaysToStay(bookRoomHOModelReq.getNumberOfDaysToStay());       
+                bookRoomHOModel.setNumberOfDaysToStay(bookRoomHOModelReq.getNumberOfDaysToStay());
 
                 bookRoomHOModel.setNumberOfRooms(bookRoomHOModelReq.getNumberOfRooms());
 
-                UUID roomId=bookRoomHOModelReq.getRoomId();
-                
-                HotelsDB hotel_ob=hotelDBRepo.findByRoomId((roomId));
+                UUID roomId = bookRoomHOModelReq.getRoomId();
 
-                
+                HotelsDB hotel_ob = hotelDBRepo.findByRoomId((roomId));
 
-               
-
-                int total_price=hotel_ob.getPricePerDay()*bookRoomHOModelReq.getNumberOfDaysToStay()*bookRoomHOModelReq.getNumberOfRooms();
+                int total_price = hotel_ob.getPricePerDay() * bookRoomHOModelReq.getNumberOfDaysToStay()
+                        * bookRoomHOModelReq.getNumberOfRooms();
 
                 bookRoomHOModel.setPriceToBePaid(total_price);
-                
+
+                // if(bookRoomHOModelReq.getNumberOfRooms()==1){
+                    
+
+                // }
+                // else if(bookRoomHOModelReq.getNumberOfRooms()>1){
+
+
+
+                // }
+
+                     
                 
 
-                        bookRoomRepo.save(bookRoomHOModel);
 
-                
+
+
+                bookRoomHOModel.setRoomNo(bookRoomHOModelReq.getRoomNo());
+
+                bookRoomRepo.save(bookRoomHOModel);
 
                 responseMessage.setSuccess(true);
                 responseMessage.setMessage("Room booked.");

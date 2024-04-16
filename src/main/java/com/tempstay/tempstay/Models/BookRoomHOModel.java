@@ -1,4 +1,5 @@
 package com.tempstay.tempstay.Models;
+
 import java.sql.Date;
 import java.util.UUID;
 
@@ -30,7 +31,7 @@ public class BookRoomHOModel {
 
     private Date checkoutDate;
 
-   private int numberOfDaysToStay;
+    private int numberOfDaysToStay;
 
     private int numberOfRooms;
 
