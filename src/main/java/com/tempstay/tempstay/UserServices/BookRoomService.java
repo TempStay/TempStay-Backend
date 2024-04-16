@@ -97,15 +97,15 @@ public class BookRoomService {
 
                 bookRoomHOModel.setPriceToBePaid(total_price);
 
-                // if(bookRoomHOModelReq.getNumberOfRooms()==1){
+                if(bookRoomHOModelReq.getNumberOfRooms()==1){
                     
 
-                // }
-                // else if(bookRoomHOModelReq.getNumberOfRooms()>1){
+                }
+                else if(bookRoomHOModelReq.getNumberOfRooms()>1){
 
 
 
-                // }
+                }
 
                      
                 
