@@ -36,9 +36,6 @@ import com.tempstay.tempstay.UserServices.UserService;
 
 import jakarta.validation.Valid;
 
-
-
-
 @RestController
 @RequestMapping("api")
 @CrossOrigin(origins = "http://localhost:5173")
@@ -73,12 +70,10 @@ public class MainController {
 
     @Autowired
     private BookRoomService bookRoomService;
-    
+
     @Autowired
     private BookRoomRepo bookRoomRepo;
 
-   
-   
     @PostMapping("adduser")
     public ResponseEntity<Object> addUser(@Valid @RequestBody Object userOrService, BindingResult bindingResult,
             @RequestHeader String role) {
@@ -158,27 +153,26 @@ public class MainController {
         return hotels;
 
     }
+
     @PostMapping("bookroom")
     public ResponseEntity<ResponseMessage> bookRoomtByUser(@RequestBody BookRoomHOModel bookRoomHOModel,
             @RequestHeader String token, @RequestHeader String role) {
         return bookRoomService.userRoomBookService(bookRoomHOModel, token, role);
     }
 
- @PostMapping("checkroom")
- public ResponseEntity<ResponseMessage> checkingfunc(@RequestBody  BookRoomHOModel bookRoomHOModelReq ) {
-     
-     
-     return bookRoomService.checkRoom(bookRoomHOModelReq.getHotelownId(),
-     bookRoomHOModelReq.getCheckinDate(), bookRoomHOModelReq.getCheckoutDate(),
-     bookRoomHOModelReq.getRoomId(),
-     bookRoomHOModelReq.getRoomNo());
- }
- 
- @GetMapping("userbookingdetails")
- public BookRoomHOModel userbookingdetails(@RequestHeader String token,@RequestHeader String role,@RequestHeader UUID roomBookingId) {
-    BookRoomHOModel ob=bookRoomRepo.findByRoomBookingId(roomBookingId);
-    return ob;
- }
- 
-    
+    @PostMapping("checkroom")
+    public ResponseEntity<ResponseMessage> checkingfunc(@RequestBody BookRoomHOModel bookRoomHOModelReq) {
+
+        return bookRoomService.checkRoom( bookRoomHOModelReq.getRoomId(), bookRoomHOModelReq.getHotelownId());
+
+               
+    }
+
+    @GetMapping("userbookingdetails")
+    public BookRoomHOModel userbookingdetails(@RequestHeader String token, @RequestHeader String role,
+            @RequestHeader UUID roomBookingId) {
+        BookRoomHOModel ob = bookRoomRepo.findByRoomBookingId(roomBookingId);
+        return ob;
+    }
+
 }

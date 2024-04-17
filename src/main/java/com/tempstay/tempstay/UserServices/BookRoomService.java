@@ -1,6 +1,5 @@
 package com.tempstay.tempstay.UserServices;
 
-import java.sql.Date;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,24 +29,32 @@ public class BookRoomService {
     @Autowired
     private UserRepository userRepository;
 
+    // @Autowired
+    // private HotelsDB hotelsDB;
+
     @Autowired
     private HotelDBRepo hotelDBRepo;
 
-    public ResponseEntity<ResponseMessage> checkRoom(UUID hotelownId, Date checkinDate, Date checkoutDate,
-            UUID roomId, UUID roomNo) {
+    public ResponseEntity<ResponseMessage> checkRoom(UUID roomId,UUID hotelownId) {
         try {
-            BookRoomHOModel userBooking = bookRoomRepo.findRoomExists(hotelownId, roomId, checkinDate, checkoutDate,
-                    roomNo);
-            if (userBooking == null) {
-                responseMessage.setSuccess(true);
-                responseMessage.setMessage("Room Empty");
+            HotelsDB hotel_ob = hotelDBRepo.findByHotelownIdAndRoomId(hotelownId,roomId);
 
-                return ResponseEntity.ok().body(responseMessage);
+            if (hotel_ob != null) {
+                int no_of_rooms = hotel_ob.getNumberOfRooms();
+
+                if (no_of_rooms > 0) {
+                    responseMessage.setSuccess(true);
+                    responseMessage.setMessage("Room Empty");
+                } else {
+                    responseMessage.setSuccess(false);
+                    responseMessage.setMessage("No Rooms Available");
+                }
             } else {
                 responseMessage.setSuccess(false);
-                responseMessage.setMessage("Room full.");
-                return ResponseEntity.ok().body(responseMessage);
+                responseMessage.setMessage("Enter valid roomId");
             }
+
+            return ResponseEntity.ok().body(responseMessage);
         } catch (Exception e) {
             responseMessage.setSuccess(false);
             responseMessage
@@ -59,10 +66,7 @@ public class BookRoomService {
     public ResponseEntity<ResponseMessage> userRoomBookService(BookRoomHOModel bookRoomHOModelReq, String token,
             String role) {
         try {
-            ResponseEntity<ResponseMessage> messageFromCheckRoom = checkRoom(bookRoomHOModelReq.getHotelownId(),
-                    bookRoomHOModelReq.getCheckinDate(), bookRoomHOModelReq.getCheckoutDate(),
-                    bookRoomHOModelReq.getRoomId(),
-                    bookRoomHOModelReq.getRoomNo());
+            ResponseEntity<ResponseMessage> messageFromCheckRoom = checkRoom(bookRoomHOModelReq.getRoomId(),bookRoomHOModelReq.getHotelownId());
 
             if (messageFromCheckRoom.getBody().getSuccess()) {
 
@@ -80,7 +84,7 @@ public class BookRoomService {
 
                 bookRoomHOModel.setCheckinDate(bookRoomHOModelReq.getCheckinDate());
 
-                bookRoomHOModel.setRoomId(bookRoomHOModelReq.getRoomId());               
+                bookRoomHOModel.setRoomId(bookRoomHOModelReq.getRoomId());
 
                 bookRoomHOModel.setCheckoutDate(bookRoomHOModelReq.getCheckoutDate());
 
@@ -97,25 +101,17 @@ public class BookRoomService {
 
                 bookRoomHOModel.setPriceToBePaid(total_price);
 
-                if(bookRoomHOModelReq.getNumberOfRooms()==1){
-                    
-
-                }
-                else if(bookRoomHOModelReq.getNumberOfRooms()>1){
-
-
-
-                }
-
-                     
-                
-
-
-
-
-                bookRoomHOModel.setRoomNo(bookRoomHOModelReq.getRoomNo());
-
                 bookRoomRepo.save(bookRoomHOModel);
+
+                int no_of_rooms = hotel_ob.getNumberOfRooms();
+
+                int updated_no_of_rooms = no_of_rooms - bookRoomHOModelReq.getNumberOfRooms();
+
+                HotelsDB hotelFromDB = hotelDBRepo.findByRoomId(bookRoomHOModelReq.getRoomId());
+
+                hotelFromDB.setNumberOfRooms(updated_no_of_rooms);
+
+                hotelDBRepo.save(hotelFromDB);
 
                 responseMessage.setSuccess(true);
                 responseMessage.setMessage("Room booked.");
@@ -132,4 +128,5 @@ public class BookRoomService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMessage);
         }
     }
+
 }

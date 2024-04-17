@@ -37,5 +37,7 @@ public class BookRoomHOModel {
 
     private int priceToBePaid;
 
-    private UUID roomNo;
+    // private String roomNo;
+
+    // private String roomType;
 }

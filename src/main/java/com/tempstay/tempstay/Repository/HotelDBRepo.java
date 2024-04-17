@@ -15,6 +15,8 @@ public interface HotelDBRepo extends JpaRepository<HotelsDB, UUID> {
     HotelsDB findByRoomType(String roomType);
     List<HotelsDB> findByEmail(String email);
     HotelsDB findByRoomId(UUID roomId);
+    // HotelsDB findByRoomType(String roomType);
+    
 
     @Transactional
     @Query(value = "SELECT * FROM hotels_db WHERE hotelown_id=:hotelownId AND room_id=:roomId",nativeQuery = true)
