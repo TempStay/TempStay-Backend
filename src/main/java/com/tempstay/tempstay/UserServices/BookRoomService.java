@@ -1,5 +1,10 @@
 package com.tempstay.tempstay.UserServices;
 
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,15 +34,14 @@ public class BookRoomService {
     @Autowired
     private UserRepository userRepository;
 
-    // @Autowired
-    // private HotelsDB hotelsDB;
+   
 
     @Autowired
     private HotelDBRepo hotelDBRepo;
 
-    public ResponseEntity<ResponseMessage> checkRoom(UUID roomId,UUID hotelownId) {
+    public ResponseEntity<ResponseMessage> checkRoom(UUID roomId, UUID hotelownId) {
         try {
-            HotelsDB hotel_ob = hotelDBRepo.findByHotelownIdAndRoomId(hotelownId,roomId);
+            HotelsDB hotel_ob = hotelDBRepo.findByHotelownIdAndRoomId(hotelownId, roomId);
 
             if (hotel_ob != null) {
                 int no_of_rooms = hotel_ob.getNumberOfRooms();
@@ -66,7 +70,8 @@ public class BookRoomService {
     public ResponseEntity<ResponseMessage> userRoomBookService(BookRoomHOModel bookRoomHOModelReq, String token,
             String role) {
         try {
-            ResponseEntity<ResponseMessage> messageFromCheckRoom = checkRoom(bookRoomHOModelReq.getRoomId(),bookRoomHOModelReq.getHotelownId());
+            ResponseEntity<ResponseMessage> messageFromCheckRoom = checkRoom(bookRoomHOModelReq.getRoomId(),
+                    bookRoomHOModelReq.getHotelownId());
 
             if (messageFromCheckRoom.getBody().getSuccess()) {
 
@@ -78,7 +83,7 @@ public class BookRoomService {
 
                 UserModel user = userRepository.findByEmail(email);
 
-                // bookRoomHOModel.setUserId(user.getId());
+                bookRoomHOModel.setUserId(user.getId());
 
                 bookRoomHOModel.setHotelownId((bookRoomHOModelReq.getHotelownId()));
 
@@ -88,7 +93,15 @@ public class BookRoomService {
 
                 bookRoomHOModel.setCheckoutDate(bookRoomHOModelReq.getCheckoutDate());
 
-                bookRoomHOModel.setNumberOfDaysToStay(bookRoomHOModelReq.getNumberOfDaysToStay());
+               
+
+                LocalDate checkOut = bookRoomHOModelReq.getCheckoutDate().toLocalDate();
+                LocalDate checkIn = bookRoomHOModelReq.getCheckinDate().toLocalDate();
+
+                long daysDifference = ChronoUnit.DAYS.between(checkIn, checkOut);
+                
+
+                bookRoomHOModel.setNumberOfDaysToStay((int) daysDifference);
 
                 bookRoomHOModel.setNumberOfRooms(bookRoomHOModelReq.getNumberOfRooms());
 
@@ -96,8 +109,8 @@ public class BookRoomService {
 
                 HotelsDB hotel_ob = hotelDBRepo.findByRoomId((roomId));
 
-                int total_price = hotel_ob.getPricePerDay() * bookRoomHOModelReq.getNumberOfDaysToStay()
-                        * bookRoomHOModelReq.getNumberOfRooms();
+                int total_price = (int) (hotel_ob.getPricePerDay() * daysDifference
+                        * bookRoomHOModelReq.getNumberOfRooms());
 
                 bookRoomHOModel.setPriceToBePaid(total_price);
 
@@ -122,6 +135,7 @@ public class BookRoomService {
             }
 
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             responseMessage.setSuccess(false);
             responseMessage.setMessage(
                     "Internal Server Error inside BookSlotServce.java Method: userBookSLotService " + e.getMessage());
