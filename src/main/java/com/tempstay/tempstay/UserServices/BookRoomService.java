@@ -78,7 +78,7 @@ public class BookRoomService {
 
                 UserModel user = userRepository.findByEmail(email);
 
-                bookRoomHOModel.setUserId(user.getId());
+                // bookRoomHOModel.setUserId(user.getId());
 
                 bookRoomHOModel.setHotelownId((bookRoomHOModelReq.getHotelownId()));
 
