@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import com.tempstay.tempstay.Models.BookRoomHOModel;
 
+
 @Repository
 public interface BookRoomRepo extends JpaRepository<BookRoomHOModel, UUID> {
 
@@ -19,5 +20,7 @@ public interface BookRoomRepo extends JpaRepository<BookRoomHOModel, UUID> {
     List<BookRoomHOModel> findByHotelownId(UUID hotelownId);
 
     BookRoomHOModel findByRoomBookingId(UUID roomBookingId);
+
+    
 
 }

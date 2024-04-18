@@ -27,6 +27,7 @@ import com.tempstay.tempstay.Repository.BookRoomRepo;
 import com.tempstay.tempstay.Repository.HotelDBRepo;
 import com.tempstay.tempstay.Repository.ServiceProviderRepository;
 import com.tempstay.tempstay.SearchFunction.SearchByAddressAndHotelName;
+import com.tempstay.tempstay.ServiceProviderServices.CheckOutUser;
 import com.tempstay.tempstay.ServiceProviderServices.ServiceProviderUpdate;
 import com.tempstay.tempstay.ServiceProviderServices.UpdateHotelDetails;
 import com.tempstay.tempstay.ServiceProviderServices.UploadHotelService;
@@ -73,6 +74,9 @@ public class MainController {
 
     @Autowired
     private BookRoomRepo bookRoomRepo;
+
+    @Autowired
+    private CheckOutUser checkOutUser;
 
     @PostMapping("adduser")
     public ResponseEntity<Object> addUser(@Valid @RequestBody Object userOrService, BindingResult bindingResult,
@@ -173,6 +177,14 @@ public class MainController {
             @RequestHeader UUID roomBookingId) {
         BookRoomHOModel ob = bookRoomRepo.findByRoomBookingId(roomBookingId);
         return ob;
+    }
+
+
+
+    @PutMapping("checkoutuser")
+    public ResponseEntity<ResponseMessage> checkout(@RequestHeader String token, @RequestHeader String role,
+            @RequestHeader UUID roomBookingId) {
+                return checkOutUser.deleteUser(token, role, roomBookingId);
     }
 
 }
