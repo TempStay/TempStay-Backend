@@ -1,4 +1,5 @@
 package com.tempstay.tempstay.UserServices;
+
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -7,6 +8,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
@@ -21,9 +23,13 @@ import com.tempstay.tempstay.Repository.OtpRepo;
 import com.tempstay.tempstay.Repository.ServiceProviderRepository;
 import com.tempstay.tempstay.Repository.UserRepository;
 import com.tempstay.tempstay.StaticInfo.OTPGenerator;
+
+import jakarta.transaction.Transactional;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
+@EnableScheduling
 public class UserService {
 
     @Autowired
@@ -56,12 +62,15 @@ public class UserService {
     @Scheduled(fixedRate = 60000)
     public void deleteExpiredRecords() {
         LocalDateTime expiryTime = LocalDateTime.now().minusMinutes(5).truncatedTo(ChronoUnit.MINUTES);
+        //System.out.println(expiryTime);
+        
         List<OTPModel> expiredRecords = otpRepo.findByCreatedAt(expiryTime);
         if (expiredRecords.size() != 0) {
             otpRepo.deleteAll(expiredRecords);
         }
     }
-     public ResponseEntity<Object> generateOTPforTwoFAServiceProviderService(ServiceProviderModel serviceProviderModel) {
+
+    public ResponseEntity<Object> generateOTPforTwoFAServiceProviderService(ServiceProviderModel serviceProviderModel) {
         try {
             int otpForTwoFA = OTPGenerator.generateRandom6DigitNumber();
             OTPModel otp = new OTPModel();
@@ -82,6 +91,7 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error!");
         }
     }
+
     public ResponseEntity<Object> generateOTPforTwoFAService(UserModel userModel) {
         try {
             int otpForTwoFA = OTPGenerator.generateRandom6DigitNumber();
@@ -91,8 +101,6 @@ public class UserService {
             otp.setOtp(otpForTwoFA);
             otp.setUseCase("login");
             otp.setCreatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
-
-          
 
             String response = emailService.sendSimpleMail(userModel.getEmail(),
                     "Your OTP for Two-Factor Authentication is " + otpForTwoFA + " . It is valid only for 5 minutes.",
@@ -176,6 +184,7 @@ public class UserService {
         }
     }
 
+
     public ResponseEntity<Object> userLoginService(LoginModel loginModel, String role) {
         try {
             if (role.equals("user")) {
@@ -227,6 +236,8 @@ public class UserService {
                     .body("Internal Server Error!");
         }
     }
+
+    @Transactional
     public ResponseEntity<Object> TwoFAService(int otpforTwoFAFromUser, String email, String role) {
         try {
             int otpFromDB = otpRepo.findByEmail(email).getOtp();
@@ -235,6 +246,7 @@ public class UserService {
                     responseMessage.setSuccess(true);
                     responseMessage.setMessage("Login Successfully!");
                     responseMessage.setToken(authService.generateToken(email));
+                    otpRepo.deleteByEmail(email);
                     return ResponseEntity.ok().body(responseMessage);
                 } else {
                     responseMessage.setSuccess(false);
@@ -246,6 +258,7 @@ public class UserService {
                     responseMessage.setSuccess(true);
                     responseMessage.setMessage("Login Successfully!");
                     responseMessage.setToken(authService.generateToken(email));
+                    otpRepo.deleteByEmail(email);
                     return ResponseEntity.ok().body(responseMessage);
                 } else {
                     responseMessage.setSuccess(false);
@@ -256,7 +269,7 @@ public class UserService {
 
         } catch (Exception e) {
             responseMessage.setSuccess(false);
-            responseMessage.setMessage("Internal Server Error! reason: "+e.getMessage());
+            responseMessage.setMessage("Internal Server Error! reason: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMessage);
         }
     }
@@ -284,7 +297,7 @@ public class UserService {
                     emailModel.setMsgBody("Your OTP for resetting your password is " + otp
                             + ". It is valid only for 5 minutes.");
 
-                            String response = emailService.sendSimpleMail(email,
+                    String response = emailService.sendSimpleMail(email,
                             "Your OTP for resetting your password is " + Integer.toString(otp)
                                     + ". It is valid only for 5 minutes.",
                             "OTP for Resetting your password");
@@ -328,6 +341,7 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error!");
         }
     }
+
     public ResponseEntity<Object> verifyTheOtpEnteredByUser(int otpFromUser, String email) {
         try {
             OTPModel otpFromDB = otpRepo.findByEmail(email);
@@ -346,33 +360,37 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMessage);
         }
     }
-        public ResponseEntity<Object> resetThePasswordService(String passwordFromUser, String role, String email) {
-            try {
-                if (role.equals("user")) {
-                    UserModel user = userRepository.findByEmail(email);
-                    user.setPassword(hashPassword(passwordFromUser));
-                    userRepository.save(user);
-    
-                    responseMessage.setSuccess(true);
-                    responseMessage.setMessage("Password Changed Successfully");
-                    responseMessage.setToken(null);
-                    return ResponseEntity.ok().body(responseMessage);
-                } else {
-                    ServiceProviderModel serviceProviderModel = serviceProviderRepository
-                            .findByEmail(email);
-                    serviceProviderModel.setPassword(hashPassword(passwordFromUser));
-                    serviceProviderRepository.save(serviceProviderModel);
-    
-                    responseMessage.setSuccess(true);
-                    responseMessage.setMessage("Password Changed Successfully");
-                    responseMessage.setToken(null);
-                    return ResponseEntity.ok().body(responseMessage);
-                }
-    
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error!");
+
+    public ResponseEntity<Object> resetThePasswordService(String passwordFromUser, String role, String email) {
+        try {
+            if (role.equals("user")) {
+                UserModel user = userRepository.findByEmail(email);
+                user.setPassword(hashPassword(passwordFromUser));
+                userRepository.save(user);
+
+                responseMessage.setSuccess(true);
+                responseMessage.setMessage("Password Changed Successfully");
+                responseMessage.setToken(null);
+                otpRepo.deleteByEmail(email);
+                return ResponseEntity.ok().body(responseMessage);
+            } else {
+                ServiceProviderModel serviceProviderModel = serviceProviderRepository
+                        .findByEmail(email);
+                serviceProviderModel.setPassword(hashPassword(passwordFromUser));
+                serviceProviderRepository.save(serviceProviderModel);
+
+                responseMessage.setSuccess(true);
+                responseMessage.setMessage("Password Changed Successfully");
+                responseMessage.setToken(null);
+                otpRepo.deleteByEmail(email);
+                return ResponseEntity.ok().body(responseMessage);
             }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error!");
         }
+    }
+
     public ResponseEntity<Object> getUserDetailsByEmailService(String token, String role) {
         try {
             String email = authService.verifyToken(token);
@@ -401,5 +419,3 @@ public class UserService {
         }
     }
 }
-
-    
