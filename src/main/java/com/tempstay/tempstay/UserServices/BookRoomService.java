@@ -1,17 +1,12 @@
 package com.tempstay.tempstay.UserServices;
 
-import java.sql.Date;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
 import com.tempstay.tempstay.Models.BookRoomHOModel;
 import com.tempstay.tempstay.Models.HotelsDB;
 import com.tempstay.tempstay.Models.ResponseMessage;

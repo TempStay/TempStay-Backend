@@ -33,6 +33,7 @@ import com.tempstay.tempstay.ServiceProviderServices.UpdateHotelDetails;
 import com.tempstay.tempstay.ServiceProviderServices.UploadHotelService;
 import com.tempstay.tempstay.UserServices.AuthService;
 import com.tempstay.tempstay.UserServices.BookRoomService;
+import com.tempstay.tempstay.UserServices.DeleteBooking;
 import com.tempstay.tempstay.UserServices.UserService;
 
 import jakarta.validation.Valid;
@@ -77,6 +78,9 @@ public class MainController {
 
     @Autowired
     private CheckOutUser checkOutUser;
+
+    @Autowired
+    private DeleteBooking deleteBooking;
 
     @PostMapping("adduser")
     public ResponseEntity<Object> addUser(@Valid @RequestBody Object userOrService, BindingResult bindingResult,
@@ -186,5 +190,9 @@ public class MainController {
             @RequestHeader UUID roomBookingId) {
                 return checkOutUser.deleteUser(token, role, roomBookingId);
     }
-
+    @PutMapping("deletebooking")
+    public ResponseEntity<ResponseMessage> deltebookingofusers(@RequestHeader String token, @RequestHeader String role,
+            @RequestHeader UUID roomBookingId) {
+                return deleteBooking.deletebooking(token, roomBookingId, role);
+    }
 }
