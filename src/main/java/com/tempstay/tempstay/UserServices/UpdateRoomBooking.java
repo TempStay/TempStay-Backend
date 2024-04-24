@@ -57,7 +57,7 @@ public class UpdateRoomBooking {
 
             bookRoomOb.setCheckinDate(changeBookingData.getCheckinDate());
 
-            // bookRoomOb.setRoomId(changeBookingData.getRoomId());
+            
 
             bookRoomOb.setCheckoutDate(changeBookingData.getCheckoutDate());
 
@@ -100,6 +100,10 @@ public class UpdateRoomBooking {
             hotelFromDB.setNumberOfRooms(updated_no_of_rooms);
 
             hotelDBRepo.save(hotelFromDB);
+
+            bookRoomOb.setRoomId(changeBookingData.getRoomId());
+
+            bookRoomRepo.save(bookRoomOb);
 
             responseMessage.setSuccess(true);
             responseMessage.setMessage("Updated Room Successfully booked.");
