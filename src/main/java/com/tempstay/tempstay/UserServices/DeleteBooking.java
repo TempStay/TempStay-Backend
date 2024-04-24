@@ -16,23 +16,23 @@ import com.tempstay.tempstay.Repository.HotelDBRepo;
 @Service
 public class DeleteBooking {
 
-@Autowired
-private AuthService authService;
+    @Autowired
+    private AuthService authService;
 
-@Autowired
-private BookRoomRepo bookRoomRepo;
+    @Autowired
+    private BookRoomRepo bookRoomRepo;
 
-@Autowired
-private ResponseMessage responseMessage;
+    @Autowired
+    private ResponseMessage responseMessage;
 
-@Autowired
-private HotelDBRepo hotelDBRepo;
+    @Autowired
+    private HotelDBRepo hotelDBRepo;
 
-    public ResponseEntity<ResponseMessage> deletebooking(String token,UUID bookingId,String role){
-        
-        String email=authService.verifyToken(token);
+    public ResponseEntity<ResponseMessage> deletebooking(String token, UUID bookingId, String role) {
 
-        if(email!=null){
+        String email = authService.verifyToken(token);
+
+        if (email != null) {
 
             BookRoomHOModel usserbookingOb = bookRoomRepo.findByRoomBookingId(bookingId);
             if (usserbookingOb == null) {
@@ -45,7 +45,11 @@ private HotelDBRepo hotelDBRepo;
 
                 HotelsDB hotelFromDB = hotelDBRepo.findByRoomId(bookRoomRepo.findById(bookingId).get().getRoomId());
 
+
+
                 int updated_no_of_rooms = noOfRooms + hotelFromDB.getNumberOfRooms();
+
+                System.out.println(updated_no_of_rooms);
 
                 hotelFromDB.setNumberOfRooms(updated_no_of_rooms);
 
@@ -67,6 +71,4 @@ private HotelDBRepo hotelDBRepo;
         }
     }
 
-        }
-
-
+}

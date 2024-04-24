@@ -17,15 +17,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tempstay.tempstay.Models.BookRoomHOModel;
+import com.tempstay.tempstay.Models.ChangeBookingData;
 import com.tempstay.tempstay.Models.HotelsDB;
 import com.tempstay.tempstay.Models.LoginModel;
 import com.tempstay.tempstay.Models.PriceHotelType;
 import com.tempstay.tempstay.Models.ResponseMessage;
 import com.tempstay.tempstay.Models.ServiceProviderModel;
+import com.tempstay.tempstay.Models.UserModel;
 import com.tempstay.tempstay.RatingService.HotelRating;
 import com.tempstay.tempstay.Repository.BookRoomRepo;
 import com.tempstay.tempstay.Repository.HotelDBRepo;
 import com.tempstay.tempstay.Repository.ServiceProviderRepository;
+import com.tempstay.tempstay.Repository.UserRepository;
 import com.tempstay.tempstay.SearchFunction.SearchByAddressAndHotelName;
 import com.tempstay.tempstay.ServiceProviderServices.CheckOutUser;
 import com.tempstay.tempstay.ServiceProviderServices.ServiceProviderUpdate;
@@ -34,9 +37,11 @@ import com.tempstay.tempstay.ServiceProviderServices.UploadHotelService;
 import com.tempstay.tempstay.UserServices.AuthService;
 import com.tempstay.tempstay.UserServices.BookRoomService;
 import com.tempstay.tempstay.UserServices.DeleteBooking;
+import com.tempstay.tempstay.UserServices.UpdateRoomBooking;
 import com.tempstay.tempstay.UserServices.UserService;
 
 import jakarta.validation.Valid;
+
 
 @RestController
 @RequestMapping("api")
@@ -81,6 +86,12 @@ public class MainController {
 
     @Autowired
     private DeleteBooking deleteBooking;
+
+    @Autowired
+    private UpdateRoomBooking updateRoomBooking;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @PostMapping("adduser")
     public ResponseEntity<Object> addUser(@Valid @RequestBody Object userOrService, BindingResult bindingResult,
@@ -171,9 +182,8 @@ public class MainController {
     @PostMapping("checkroom")
     public ResponseEntity<ResponseMessage> checkingfunc(@RequestBody BookRoomHOModel bookRoomHOModelReq) {
 
-        return bookRoomService.checkRoom( bookRoomHOModelReq.getRoomId(), bookRoomHOModelReq.getHotelownId());
+        return bookRoomService.checkRoom(bookRoomHOModelReq.getRoomId(), bookRoomHOModelReq.getHotelownId());
 
-               
     }
 
     @GetMapping("userbookingdetails")
@@ -183,16 +193,30 @@ public class MainController {
         return ob;
     }
 
-
-
     @PutMapping("checkoutuser")
     public ResponseEntity<ResponseMessage> checkout(@RequestHeader String token, @RequestHeader String role,
             @RequestHeader UUID roomBookingId) {
-                return checkOutUser.deleteUser(token, role, roomBookingId);
+        return checkOutUser.deleteUser(token, role, roomBookingId);
     }
+
     @PutMapping("deletebooking")
     public ResponseEntity<ResponseMessage> deltebookingofusers(@RequestHeader String token, @RequestHeader String role,
             @RequestHeader UUID roomBookingId) {
-                return deleteBooking.deletebooking(token, roomBookingId, role);
+        return deleteBooking.deletebooking(token, roomBookingId, role);
     }
+
+    @PutMapping("updateroombooking")
+    public ResponseEntity<ResponseMessage> updateroom(@RequestHeader String token, @RequestHeader String role,
+            @RequestBody ChangeBookingData changeBookingData) {
+        return updateRoomBooking.reScheduleRoomService(changeBookingData, token, role);
+    }
+
+    @GetMapping("getuserdetails")
+    public List<BookRoomHOModel> getMethodName(@RequestHeader String token, @RequestHeader String role) {
+        String email=authService.verifyToken(token);
+        UserModel user=userRepository.findByEmail(email);
+        return bookRoomRepo.findByUserId(user.getId());
+    }
+    
+
 }
