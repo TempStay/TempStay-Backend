@@ -44,7 +44,7 @@ public class ServiceProviderUpdate {
         } catch (Exception e) {
             responseMessage.setSuccess(false);
             responseMessage.setMessage(
-                    "Internal server error in ArenaDetailsUpdateService.java. Method: arenaDetailsUpdateService. Reason: "
+                    "Internal server error in ServiceProviderUpdateService.java. Method: ServiceProviderUpdateService. Reason: "
                             + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMessage);
         }

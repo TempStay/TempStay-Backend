@@ -14,15 +14,19 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.tempstay.tempstay.Models.BookRoomHOModel;
 import com.tempstay.tempstay.Models.ChangeBookingData;
 import com.tempstay.tempstay.Models.HotelsDB;
+import com.tempstay.tempstay.Models.ImagesDB;
 import com.tempstay.tempstay.Models.LoginModel;
 import com.tempstay.tempstay.Models.PriceHotelType;
 import com.tempstay.tempstay.Models.ResponseMessage;
 import com.tempstay.tempstay.Models.ServiceProviderModel;
+import com.tempstay.tempstay.Models.UpdateUserDetails;
 import com.tempstay.tempstay.Models.UserModel;
 import com.tempstay.tempstay.RatingService.HotelRating;
 import com.tempstay.tempstay.Repository.BookRoomRepo;
@@ -31,6 +35,8 @@ import com.tempstay.tempstay.Repository.ServiceProviderRepository;
 import com.tempstay.tempstay.Repository.UserRepository;
 import com.tempstay.tempstay.SearchFunction.SearchByAddressAndHotelName;
 import com.tempstay.tempstay.ServiceProviderServices.CheckOutUser;
+import com.tempstay.tempstay.ServiceProviderServices.FetchHotelImages;
+import com.tempstay.tempstay.ServiceProviderServices.ImageUploadService;
 import com.tempstay.tempstay.ServiceProviderServices.ServiceProviderUpdate;
 import com.tempstay.tempstay.ServiceProviderServices.UpdateHotelDetails;
 import com.tempstay.tempstay.ServiceProviderServices.UploadHotelService;
@@ -92,6 +98,12 @@ public class MainController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ImageUploadService imageUploadService;
+
+    @Autowired
+    private FetchHotelImages fetchImagesService;
 
     @PostMapping("adduser")
     public ResponseEntity<Object> addUser(@Valid @RequestBody Object userOrService, BindingResult bindingResult,
@@ -217,6 +229,29 @@ public class MainController {
         UserModel user=userRepository.findByEmail(email);
         return bookRoomRepo.findByUserId(user.getId());
     }
-    
+    @PostMapping("uploadimages")
+    public ResponseEntity<ResponseMessage> uploadImages(@RequestHeader String token, @RequestHeader String role,
+            @RequestParam("images") List<MultipartFile> images) {
+        return imageUploadService.uploadImageService(token, role, images);
+    }
+
+
+    @GetMapping("getimages")
+    public List<ImagesDB> getAllImages(@RequestHeader String token, @RequestHeader String role) {
+        return fetchImagesService.fetchImagesService(token, role);
+    }
+
+    @PutMapping("updateuserdetails")
+    public ResponseEntity<ResponseMessage> updateuserdetails(@RequestHeader String token,
+            @RequestBody UpdateUserDetails details) {
+        return userService.updateuserdetails(token, details);
+    }
+
+    @GetMapping("userdetailsdashboard")
+    public List<BookRoomHOModel> userdashboard(@RequestHeader String token, @RequestHeader String role) {
+        String email=authService.verifyToken(token);
+        ServiceProviderModel serviceprovider=serviceProviderRepository.findByEmail(email);
+        return bookRoomRepo.findByHotelownId(serviceprovider.getId());
+    }
 
 }

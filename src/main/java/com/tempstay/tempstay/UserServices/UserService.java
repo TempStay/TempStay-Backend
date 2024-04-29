@@ -18,6 +18,7 @@ import com.tempstay.tempstay.Models.LoginModel;
 import com.tempstay.tempstay.Models.OTPModel;
 import com.tempstay.tempstay.Models.ResponseMessage;
 import com.tempstay.tempstay.Models.ServiceProviderModel;
+import com.tempstay.tempstay.Models.UpdateUserDetails;
 import com.tempstay.tempstay.Models.UserModel;
 import com.tempstay.tempstay.Repository.OtpRepo;
 import com.tempstay.tempstay.Repository.ServiceProviderRepository;
@@ -53,6 +54,8 @@ public class UserService {
     @Autowired
     private OtpRepo otpRepo;
 
+    
+
     public String hashPassword(String password) {
         String strong_salt = BCrypt.gensalt(10);
         String encyptedPassword = BCrypt.hashpw(password, strong_salt);
@@ -62,8 +65,8 @@ public class UserService {
     @Scheduled(fixedRate = 60000)
     public void deleteExpiredRecords() {
         LocalDateTime expiryTime = LocalDateTime.now().minusMinutes(5).truncatedTo(ChronoUnit.MINUTES);
-        //System.out.println(expiryTime);
-        
+        // System.out.println(expiryTime);
+
         List<OTPModel> expiredRecords = otpRepo.findByCreatedAt(expiryTime);
         if (expiredRecords.size() != 0) {
             otpRepo.deleteAll(expiredRecords);
@@ -183,7 +186,6 @@ public class UserService {
                     .body("Internal Server Error!");
         }
     }
-
 
     public ResponseEntity<Object> userLoginService(LoginModel loginModel, String role) {
         try {
@@ -418,4 +420,35 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error!");
         }
     }
-}
+
+    public ResponseEntity<ResponseMessage> updateuserdetails(String token, UpdateUserDetails details) {
+try{
+        String email = authService.verifyToken(token);
+        UserModel user = userRepository.findByEmail(email);
+        UserModel updateToBeDone = userRepository.findByEmail(email);
+        if (updateToBeDone == null) {
+            responseMessage.setSuccess(false);
+            responseMessage.setMessage("User with this email: " + email + " doesn't exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseMessage);
+        } else {
+
+            // user.setEmail(details.getEmail());
+            user.setUserName(details.getUserName());
+            user.setPhoneNumber(details.getPhoneNumber());
+
+            userRepository.save(user);
+
+            responseMessage.setSuccess(true);
+            responseMessage.setMessage("Details updated successfully");
+            return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+
+        }
+
+    }catch (Exception e) {
+        responseMessage.setSuccess(false);
+        responseMessage.setMessage(
+                "Internal server error in UserService.java. Method: UserService. Reason: "
+                        + e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMessage);
+    }
+}}
