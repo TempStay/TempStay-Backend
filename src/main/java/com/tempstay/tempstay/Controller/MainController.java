@@ -116,12 +116,12 @@ public class MainController {
         return userService.getUserDetailsByEmailService(token, role);
     }
 
-    @GetMapping("login")
+    @PostMapping("login")
     public ResponseEntity<Object> verifyUser(@RequestBody LoginModel loginModel, @RequestHeader String role) {
         return userService.userLoginService(loginModel, role);
     }
 
-    @PostMapping("2fa")
+    @PostMapping("2factorauthentication")
     public ResponseEntity<Object> twofa(@RequestHeader int otpforTwoFAFromUser, @RequestHeader String email,
             @RequestHeader String role) {
         return userService.TwoFAService(otpforTwoFAFromUser, email, role);

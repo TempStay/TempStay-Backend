@@ -63,7 +63,7 @@ public class UploadHotelService {
                 return ResponseEntity.ok().body(responseMessage);
             } else {
                 responseMessage.setSuccess(false);
-                responseMessage.setMessage("Hotels registered successfully but these " + duplicatesMessage
+                responseMessage.setMessage( duplicatesMessage
                         + " already exists, hence not been added.");
                 return ResponseEntity.ok().body(responseMessage);
             }

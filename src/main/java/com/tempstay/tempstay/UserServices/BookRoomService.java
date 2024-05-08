@@ -69,73 +69,71 @@ public class BookRoomService {
                     bookRoomHOModelReq.getHotelownId());
 
             if (messageFromCheckRoom.getBody().getSuccess()) {
+                // Get the hotel details
+                HotelsDB hotel_ob = hotelDBRepo.findByRoomId(bookRoomHOModelReq.getRoomId());
 
-                BookRoomHOModel bookRoomHOModel = new BookRoomHOModel();
+                // Calculate the available rooms
+                int availableRooms = hotel_ob.getNumberOfRooms();
 
-                bookRoomHOModel.setHotelownId(bookRoomHOModelReq.getHotelownId());
+                // Check if the requested number of rooms is available
+                if (bookRoomHOModelReq.getNumberOfRooms() <= availableRooms) {
+                    BookRoomHOModel bookRoomHOModel = new BookRoomHOModel();
 
-                String email = authService.verifyToken(token);
+                    bookRoomHOModel.setHotelownId(bookRoomHOModelReq.getHotelownId());
 
-                UserModel user = userRepository.findByEmail(email);
+                    String email = authService.verifyToken(token);
 
-                bookRoomHOModel.setUserId(user.getId());
+                    UserModel user = userRepository.findByEmail(email);
 
-                bookRoomHOModel.setHotelownId((bookRoomHOModelReq.getHotelownId()));
+                    bookRoomHOModel.setUserId(user.getId());
 
-                bookRoomHOModel.setCheckinDate(bookRoomHOModelReq.getCheckinDate());
+                    bookRoomHOModel.setHotelownId((bookRoomHOModelReq.getHotelownId()));
 
-                bookRoomHOModel.setRoomId(bookRoomHOModelReq.getRoomId());
+                    bookRoomHOModel.setCheckinDate(bookRoomHOModelReq.getCheckinDate());
 
-                bookRoomHOModel.setCheckoutDate(bookRoomHOModelReq.getCheckoutDate());
+                    bookRoomHOModel.setRoomId(bookRoomHOModelReq.getRoomId());
 
-               
+                    bookRoomHOModel.setCheckoutDate(bookRoomHOModelReq.getCheckoutDate());
 
-                LocalDate checkOut = bookRoomHOModelReq.getCheckoutDate().toLocalDate();
-                LocalDate checkIn = bookRoomHOModelReq.getCheckinDate().toLocalDate();
+                    LocalDate checkOut = bookRoomHOModelReq.getCheckoutDate().toLocalDate();
+                    LocalDate checkIn = bookRoomHOModelReq.getCheckinDate().toLocalDate();
 
-                long daysDifference = ChronoUnit.DAYS.between(checkIn, checkOut);
-                
+                    long daysDifference = ChronoUnit.DAYS.between(checkIn, checkOut);
 
-                bookRoomHOModel.setNumberOfDaysToStay((int) daysDifference);
+                    bookRoomHOModel.setNumberOfDaysToStay((int) daysDifference);
 
-                bookRoomHOModel.setNumberOfRooms(bookRoomHOModelReq.getNumberOfRooms());
+                    bookRoomHOModel.setNumberOfRooms(bookRoomHOModelReq.getNumberOfRooms());
 
-                UUID roomId = bookRoomHOModelReq.getRoomId();
+                    int total_price = (int) (hotel_ob.getPricePerDay() * daysDifference
+                            * bookRoomHOModelReq.getNumberOfRooms());
 
-                HotelsDB hotel_ob = hotelDBRepo.findByRoomId((roomId));
+                    bookRoomHOModel.setPriceToBePaid(total_price);
 
-                int total_price = (int) (hotel_ob.getPricePerDay() * daysDifference
-                        * bookRoomHOModelReq.getNumberOfRooms());
+                    bookRoomRepo.save(bookRoomHOModel);
 
-                bookRoomHOModel.setPriceToBePaid(total_price);
+                    // Update the number of available rooms
+                    hotel_ob.setNumberOfRooms(availableRooms - bookRoomHOModelReq.getNumberOfRooms());
+                    hotelDBRepo.save(hotel_ob);
 
-                bookRoomRepo.save(bookRoomHOModel);
+                    responseMessage.setSuccess(true);
+                    responseMessage.setMessage("Room booked.");
 
-                int no_of_rooms = hotel_ob.getNumberOfRooms();
-
-                int updated_no_of_rooms = no_of_rooms - bookRoomHOModelReq.getNumberOfRooms();
-
-                HotelsDB hotelFromDB = hotelDBRepo.findByRoomId(bookRoomHOModelReq.getRoomId());
-
-                hotelFromDB.setNumberOfRooms(updated_no_of_rooms);
-
-                hotelDBRepo.save(hotelFromDB);
-
-                responseMessage.setSuccess(true);
-                responseMessage.setMessage("Room booked.");
-
-                return ResponseEntity.ok().body(responseMessage);
+                    return ResponseEntity.ok().body(responseMessage);
+                } else {
+                    // Not enough rooms available
+                    responseMessage.setSuccess(false);
+                    responseMessage.setMessage("Not enough rooms available.");
+                    return ResponseEntity.badRequest().body(responseMessage);
+                }
             } else {
                 return messageFromCheckRoom;
             }
-
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            // Handle exceptions
             responseMessage.setSuccess(false);
-            responseMessage.setMessage(
-                    "Internal Server Error inside BookSlotServce.java Method: userBookSLotService " + e.getMessage());
+            responseMessage.setMessage("An error occurred while processing your request.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMessage);
         }
-    }
+}
 
 }
