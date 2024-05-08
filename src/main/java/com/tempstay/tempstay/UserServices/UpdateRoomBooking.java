@@ -36,10 +36,10 @@ public class UpdateRoomBooking {
     public ResponseEntity<ResponseMessage> reScheduleRoomService(ChangeBookingData changeBookingData, String token,
             String role) {
         try {
-            System.out.println(changeBookingData);
+            // System.out.println(changeBookingData);
             BookRoomHOModel bookRoomOb = bookRoomRepo.findByRoomBookingId(changeBookingData.getRoomBookingId());
 
-            System.out.println(bookRoomOb);
+            // System.out.println(bookRoomOb);
 
             if (bookRoomOb == null) {
                 responseMessage.setSuccess(false);
