@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public interface OtpRepo extends JpaRepository<OTPModel, UUID> {
 
     OTPModel findByEmail(String email);
-
+    
     void deleteByEmail(String email);
 
     List<OTPModel> findByCreatedAt(LocalDateTime createdAt);

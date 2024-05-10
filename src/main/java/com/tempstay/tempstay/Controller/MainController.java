@@ -1,5 +1,6 @@
 package com.tempstay.tempstay.Controller;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -47,7 +48,6 @@ import com.tempstay.tempstay.UserServices.UpdateRoomBooking;
 import com.tempstay.tempstay.UserServices.UserService;
 
 import jakarta.validation.Valid;
-
 
 @RestController
 @RequestMapping("api")
@@ -225,16 +225,16 @@ public class MainController {
 
     @GetMapping("getuserdetails")
     public List<BookRoomHOModel> getMethodName(@RequestHeader String token, @RequestHeader String role) {
-        String email=authService.verifyToken(token);
-        UserModel user=userRepository.findByEmail(email);
+        String email = authService.verifyToken(token);
+        UserModel user = userRepository.findByEmail(email);
         return bookRoomRepo.findByUserId(user.getId());
     }
+
     @PostMapping("uploadimages")
     public ResponseEntity<ResponseMessage> uploadImages(@RequestHeader String token, @RequestHeader String role,
             @RequestParam("images") List<MultipartFile> images) {
         return imageUploadService.uploadImageService(token, role, images);
     }
-
 
     @GetMapping("getimages")
     public List<ImagesDB> getAllImages(@RequestHeader String token, @RequestHeader String role) {
@@ -249,9 +249,23 @@ public class MainController {
 
     @GetMapping("userdetailsdashboard")
     public List<BookRoomHOModel> userdashboard(@RequestHeader String token, @RequestHeader String role) {
-        String email=authService.verifyToken(token);
-        ServiceProviderModel serviceprovider=serviceProviderRepository.findByEmail(email);
+        String email = authService.verifyToken(token);
+        ServiceProviderModel serviceprovider = serviceProviderRepository.findByEmail(email);
         return bookRoomRepo.findByHotelownId(serviceprovider.getId());
+    }
+
+    @GetMapping("getallhotels")
+    public List<HotelsDB> getAllHotels(@RequestHeader String token, @RequestHeader String role) {
+        String email = authService.verifyToken(token);
+
+        UserModel user = userRepository.findByEmail(email);
+        if (user == null) {
+
+            return Collections.emptyList(); // Returning an empty list
+        }
+
+        List<HotelsDB> allHotels = hotelDBRepo.findAll();
+        return allHotels;
     }
 
 }
