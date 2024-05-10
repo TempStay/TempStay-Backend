@@ -350,11 +350,14 @@ public class UserService {
             if (otpFromDB.getOtp() == otpFromUser) {
                 responseMessage.setSuccess(true);
                 responseMessage.setMessage("OTP Verified");
+                responseMessage.setToken(null);
+                otpRepo.delete(otpFromDB);
                 return ResponseEntity.ok().body(responseMessage);
             } else {
                 responseMessage.setSuccess(false);
                 responseMessage.setMessage("Invalid OTP, check your registered Email to get the 6-digit OTP");
-                return ResponseEntity.badRequest().body(responseMessage);
+                responseMessage.setToken(null);
+                return ResponseEntity.ok().body(responseMessage);
             }
         } catch (Exception e) {
             responseMessage.setSuccess(false);
@@ -373,7 +376,7 @@ public class UserService {
                 responseMessage.setSuccess(true);
                 responseMessage.setMessage("Password Changed Successfully");
                 responseMessage.setToken(null);
-                otpRepo.deleteByEmail(email);
+                
                 return ResponseEntity.ok().body(responseMessage);
             } else {
                 ServiceProviderModel serviceProviderModel = serviceProviderRepository
@@ -389,7 +392,7 @@ public class UserService {
             }
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error!");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error!"+e.getMessage());
         }
     }
 
