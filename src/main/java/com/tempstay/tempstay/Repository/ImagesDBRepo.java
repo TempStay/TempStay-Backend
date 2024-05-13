@@ -4,11 +4,13 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.tempstay.tempstay.Models.ImagesDB;
+
+import java.time.LocalDate;
 import java.util.List;
 
 
 public interface ImagesDBRepo extends JpaRepository<ImagesDB, UUID> {
     List<ImagesDB> findByhotelownId(UUID hotelownId);
-    
+     List<ImagesDB> findByDateOfGenration(LocalDate dateOfGenration);
 }
 

@@ -129,7 +129,7 @@ public class BookRoomService {
                 return messageFromCheckRoom;
             }
         } catch (Exception e) {
-            // Handle exceptions
+           
             responseMessage.setSuccess(false);
             responseMessage.setMessage("An error occurred while processing your request.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMessage);

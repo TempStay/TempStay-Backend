@@ -49,7 +49,7 @@ public class DeleteBooking {
 
                 int updated_no_of_rooms = noOfRooms + hotelFromDB.getNumberOfRooms();
 
-                System.out.println(updated_no_of_rooms);
+                
 
                 hotelFromDB.setNumberOfRooms(updated_no_of_rooms);
 

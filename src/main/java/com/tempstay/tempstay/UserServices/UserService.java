@@ -63,7 +63,7 @@ public class UserService {
     @Scheduled(fixedRate = 60000)
     public void deleteExpiredRecords() {
         LocalDateTime expiryTime = LocalDateTime.now().minusMinutes(5).truncatedTo(ChronoUnit.MINUTES);
-        // System.out.println(expiryTime);
+       
 
         List<OTPModel> expiredRecords = otpRepo.findByCreatedAt(expiryTime);
         if (expiredRecords.size() != 0) {

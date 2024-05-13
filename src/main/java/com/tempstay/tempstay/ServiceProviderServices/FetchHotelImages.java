@@ -19,14 +19,7 @@ import com.tempstay.tempstay.UserServices.AuthService;
 @Service
 public class FetchHotelImages {
 
-    // @Autowired
-    // private GetSPDetailsMW getSPDetailsMW;
-
-    // @Autowired
-    // private HotelsDB hotelsDB;
-
-    // @Autowired
-    // private HotelDBRepo  
+   
 
     @Autowired
     private HotelDBRepo hotelDBRepo;
@@ -43,16 +36,16 @@ public class FetchHotelImages {
     @Autowired
     private ServiceProviderRepository serviceProviderRepository;
 
-    public List<HotelsDB> fetchSportsService(String token, String role) {
+    public List<HotelsDB> fetchHotelsService(String token, String role) {
         String email=authService.verifyToken(token);
         UUID hotelownId=serviceProviderRepository.findByEmail(email).getId();
-        // ResponseEntity<ResponseMessage> spId = getSPDetailsMW.getSPDetailsByToken(token, role);
-        List<HotelsDB> sports = hotelDBRepo.findByHotelownId(hotelownId);
-        return sports;
+       
+        List<HotelsDB> hotels = hotelDBRepo.findByHotelownId(hotelownId);
+        return hotels;
     }
 
     public List<ImagesDB> fetchImagesService(String token, String role) {
-        // ResponseEntity<ResponseMessage> spId = getSPDetailsMW.getSPDetailsByToken(token, role);
+       
         String email=authService.verifyToken(token);
         UUID hotelownId=serviceProviderRepository.findByEmail(email).getId();
 
@@ -60,13 +53,13 @@ public class FetchHotelImages {
         return images;
     }
 
-    public ResponseEntity<Object> fetchSportBySportIdAndSpIdService(UUID hotelownId, UUID roomId) {
+    public ResponseEntity<Object> findByRoomIdAndHotelownIdService(UUID hotelownId, UUID roomId) {
         try {
-            HotelsDB sortedBySportIdAndSpId = hotelDBRepo.findByHotelownIdAndRoomId(hotelownId, roomId);
+            HotelsDB sortedByRoomIdAndhotelownId = hotelDBRepo.findByHotelownIdAndRoomId(hotelownId, roomId);
                     
 
-            if (sortedBySportIdAndSpId != null) {
-                return ResponseEntity.ok().body(sortedBySportIdAndSpId);
+            if (sortedByRoomIdAndhotelownId != null) {
+                return ResponseEntity.ok().body(sortedByRoomIdAndhotelownId);
             } else {
                 responseMessage.setSuccess(false);
                 responseMessage.setMessage("Room with this id doesn't exists.");
