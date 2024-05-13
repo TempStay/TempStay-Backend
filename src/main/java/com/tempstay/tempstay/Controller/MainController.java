@@ -275,5 +275,13 @@ public class MainController {
         return hotels;
 
     }
+    @GetMapping("getdetailsbyhotelownid")
+    public HotelsDB gethotelsdetailsbyhotelownidandromtype(@RequestHeader String hotelownId,@RequestHeader String roomType) {
+        
+        HotelsDB hotels = hotelDBRepo.findByHotelownIdAndRoomType(UUID.fromString(hotelownId),roomType);
+        return hotels;
 
+
+
+}
 }
