@@ -54,8 +54,6 @@ public class UserService {
     @Autowired
     private OtpRepo otpRepo;
 
-    
-
     public String hashPassword(String password) {
         String strong_salt = BCrypt.gensalt(10);
         String encyptedPassword = BCrypt.hashpw(password, strong_salt);
@@ -183,7 +181,7 @@ public class UserService {
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Internal Server Error! "+e.getMessage());
+                    .body("Internal Server Error! " + e.getMessage());
         }
     }
 
@@ -376,7 +374,7 @@ public class UserService {
                 responseMessage.setSuccess(true);
                 responseMessage.setMessage("Password Changed Successfully");
                 responseMessage.setToken(null);
-                
+
                 return ResponseEntity.ok().body(responseMessage);
             } else {
                 ServiceProviderModel serviceProviderModel = serviceProviderRepository
@@ -392,7 +390,8 @@ public class UserService {
             }
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error!"+e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Internal Server Error!" + e.getMessage());
         }
     }
 
@@ -425,33 +424,34 @@ public class UserService {
     }
 
     public ResponseEntity<ResponseMessage> updateuserdetails(String token, UpdateUserDetails details) {
-try{
-        String email = authService.verifyToken(token);
-        UserModel user = userRepository.findByEmail(email);
-        UserModel updateToBeDone = userRepository.findByEmail(email);
-        if (updateToBeDone == null) {
+        try {
+            String email = authService.verifyToken(token);
+            UserModel user = userRepository.findByEmail(email);
+            UserModel updateToBeDone = userRepository.findByEmail(email);
+            if (updateToBeDone == null) {
+                responseMessage.setSuccess(false);
+                responseMessage.setMessage("User with this email: " + email + " doesn't exist");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseMessage);
+            } else {
+
+                // user.setEmail(details.getEmail());
+                user.setUserName(details.getUserName());
+                user.setPhoneNumber(details.getPhoneNumber());
+
+                userRepository.save(user);
+
+                responseMessage.setSuccess(true);
+                responseMessage.setMessage("Details updated successfully");
+                return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+
+            }
+
+        } catch (Exception e) {
             responseMessage.setSuccess(false);
-            responseMessage.setMessage("User with this email: " + email + " doesn't exist");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseMessage);
-        } else {
-
-            // user.setEmail(details.getEmail());
-            user.setUserName(details.getUserName());
-            user.setPhoneNumber(details.getPhoneNumber());
-
-            userRepository.save(user);
-
-            responseMessage.setSuccess(true);
-            responseMessage.setMessage("Details updated successfully");
-            return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
-
+            responseMessage.setMessage(
+                    "Internal server error in UserService.java. Method: UserService. Reason: "
+                            + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMessage);
         }
-
-    }catch (Exception e) {
-        responseMessage.setSuccess(false);
-        responseMessage.setMessage(
-                "Internal server error in UserService.java. Method: UserService. Reason: "
-                        + e.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMessage);
     }
-}}
+}
