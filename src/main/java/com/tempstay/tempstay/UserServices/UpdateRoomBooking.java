@@ -30,16 +30,14 @@ public class UpdateRoomBooking {
     @Autowired
     private BookRoomService bookRoomService;
 
-    // @Autowired
-    // private DeleteBooking deleteBooking;
 
     public ResponseEntity<ResponseMessage> reScheduleRoomService(ChangeBookingData changeBookingData, String token,
             String role) {
         try {
-            // System.out.println(changeBookingData);
+            
             BookRoomHOModel bookRoomOb = bookRoomRepo.findByRoomBookingId(changeBookingData.getRoomBookingId());
 
-            // System.out.println(bookRoomOb);
+            
 
             if (bookRoomOb == null) {
                 responseMessage.setSuccess(false);
@@ -61,8 +59,7 @@ public class UpdateRoomBooking {
 
             bookRoomOb.setCheckoutDate(changeBookingData.getCheckoutDate());
 
-            // bookRoomOb.setHotelownId(bookRoomOb.getHotelownId());
-
+           
             LocalDate checkOut = changeBookingData.getCheckoutDate().toLocalDate();
 
             LocalDate checkIn = changeBookingData.getCheckinDate().toLocalDate();
@@ -95,8 +92,7 @@ public class UpdateRoomBooking {
 
             int updated_no_of_rooms = noOfRooms + hotelFromDB.getNumberOfRooms();
 
-            System.out.println(updated_no_of_rooms);
-
+            
             hotelFromDB.setNumberOfRooms(updated_no_of_rooms);
 
             hotelDBRepo.save(hotelFromDB);
@@ -109,7 +105,7 @@ public class UpdateRoomBooking {
             responseMessage.setMessage("Updated Room Successfully booked.");
             return ResponseEntity.ok().body(responseMessage);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            
             responseMessage.setSuccess(false);
             responseMessage.setMessage(
                     "Internal Server Error inside BookSlotServce.java Method: userBookSLotService " + e.getMessage());

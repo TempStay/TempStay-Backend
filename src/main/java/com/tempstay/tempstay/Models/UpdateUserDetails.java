@@ -10,6 +10,6 @@ public class UpdateUserDetails {
     
 private String userName;
 private long phoneNumber;
-// private String email;
+
 
 }

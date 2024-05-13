@@ -1,5 +1,6 @@
 package com.tempstay.tempstay.ServiceProviderServices;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,7 +34,6 @@ public class ImageUploadService {
     @Autowired
     private ServiceProviderRepository serviceProviderRepository;
 
-
     @Autowired
     private AuthService authService;
 
@@ -43,31 +43,30 @@ public class ImageUploadService {
             String failedImages = "";
 
             for (int i = 0; i < images.size(); i++) {
-                
-                String email=authService.verifyToken(token);
 
+                String email = authService.verifyToken(token);
 
-
-
-            String hotelownId =serviceProviderRepository.findByEmail(email).getId().toString();
+                String hotelownId = serviceProviderRepository.findByEmail(email).getId().toString();
 
                 ImagesDB imagesDB = new ImagesDB();
 
                 UUID imageUUID = UUID.randomUUID();
-                UUID key=imageUUID;
+                UUID key = imageUUID;
                 imagesDB.setImageId(imageUUID);
 
                 imagesDB.setHotelownId(UUID.fromString(hotelownId));
 
-                ResponseMessage messageFromPutObjectService = s3PutObjectService.putObjectService(hotelownId, key.toString(),images.get(i)).getBody();
+                ResponseMessage messageFromPutObjectService = s3PutObjectService
+                        .putObjectService(hotelownId, key.toString(), images.get(i)).getBody();
 
                 if (messageFromPutObjectService.getSuccess()) {
                     imagesDB.setImageURL(messageFromPutObjectService.getMessage());
+                    imagesDB.setDateOfGenration(LocalDate.now());
                     imagesDBRepo.save(imagesDB);
                 } else {
                     failedImages += images.get(i).getOriginalFilename();
                     failedImages += ", ";
-                    failedImages+= "Reason: "+messageFromPutObjectService.getMessage();
+                    failedImages += "Reason: " + messageFromPutObjectService.getMessage();
                 }
             }
 

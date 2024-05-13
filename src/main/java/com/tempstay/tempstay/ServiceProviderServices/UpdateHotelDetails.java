@@ -29,7 +29,7 @@ public class  UpdateHotelDetails {
     public ResponseEntity<ResponseMessage> updateHotelDetailsService(PriceHotelType latesthotelDetails, UUID roomId) {
         try {
             HotelsDB hotelToBeUpdated = hotelDBRepo.findByRoomId(roomId);
-            System.out.println("Latest hotel details"+latesthotelDetails);
+            
 
             if (hotelToBeUpdated == null) {
                 responseMessage.setSuccess(false);

@@ -1,14 +1,19 @@
 package com.tempstay.tempstay.ServiceProviderServices;
 
 import java.time.Duration;
+import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.tempstay.tempstay.Models.ImagesDB;
 import com.tempstay.tempstay.Models.ResponseMessage;
+import com.tempstay.tempstay.Repository.ImagesDBRepo;
 import com.tempstay.tempstay.StaticInfo.S3Data;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -26,6 +31,38 @@ public class S3PutObjectService {
     @Autowired
     private ResponseMessage responseMessage;
 
+    // @Autowired
+    // private ResponseMessage responseMessage;
+
+    @Autowired
+    private ImagesDBRepo imagesDBRepo;
+
+    @Scheduled(fixedRate = 86400000)
+    public void deleteExpiredRecords() {
+        LocalDate expiryTime = LocalDate.now();
+
+        List<ImagesDB> imagesFromDB = imagesDBRepo.findAll();
+        String folderName = System.getenv("FOLDER_FOR_SERVICE_PROVIDER_IMAGES");
+
+        for (int i = 0; i < imagesFromDB.size(); i++) {
+
+            if(imagesFromDB.get(i).getDateOfGenration().isBefore(expiryTime))
+            {
+                String key = folderName + '/' + imagesFromDB.get(i).getHotelownId() + '/' + imagesFromDB.get(i).getImageId();
+                ResponseEntity<ResponseMessage> newPresignedURL = preSignedURLService(
+                        imagesFromDB.get(i).getHotelownId().toString(), key);
+                imagesFromDB.get(i).setImageURL(newPresignedURL.getBody().getMessage());
+                imagesFromDB.get(i).setDateOfGenration(LocalDate.now());
+                imagesDBRepo.save(imagesFromDB.get(i));
+            }            
+
+        }
+    }
+    
+    
+    
+    
+    
     public boolean checkObjectInBucket(String bucketName, String key) {
         S3Client s3Client = S3Data.s3Client;
 
@@ -54,7 +91,7 @@ public class S3PutObjectService {
                         .build();
 
                 GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                        .signatureDuration(Duration.ofHours(10))
+                        .signatureDuration(Duration.ofHours(12))
                         .getObjectRequest(request)
                         .build();
 

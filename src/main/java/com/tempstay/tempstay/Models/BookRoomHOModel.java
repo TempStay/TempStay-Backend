@@ -37,7 +37,4 @@ public class BookRoomHOModel {
 
     private int priceToBePaid;
 
-    // private String roomNo;
-
-    // private String roomType;
 }

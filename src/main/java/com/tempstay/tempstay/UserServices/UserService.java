@@ -65,7 +65,7 @@ public class UserService {
     @Scheduled(fixedRate = 60000)
     public void deleteExpiredRecords() {
         LocalDateTime expiryTime = LocalDateTime.now().minusMinutes(5).truncatedTo(ChronoUnit.MINUTES);
-        // System.out.println(expiryTime);
+       
 
         List<OTPModel> expiredRecords = otpRepo.findByCreatedAt(expiryTime);
         if (expiredRecords.size() != 0) {
@@ -435,7 +435,7 @@ try{
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseMessage);
         } else {
 
-            // user.setEmail(details.getEmail());
+           
             user.setUserName(details.getUserName());
             user.setPhoneNumber(details.getPhoneNumber());
 
