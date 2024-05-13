@@ -268,4 +268,12 @@ public class MainController {
         return allHotels;
     }
 
+    @GetMapping("getdetailsbyhotelownid")
+    public List<HotelsDB> gethotelsdetails(@RequestHeader String hotelownId) {
+        
+        List<HotelsDB> hotels = hotelDBRepo.findByHotelownId(UUID.fromString(hotelownId));
+        return hotels;
+
+    }
+
 }
