@@ -37,7 +37,7 @@ public class  UpdateHotelDetails {
                         + latesthotelDetails.getRoom() + " doesn't exist.");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseMessage);
             } else {
-                hotelToBeUpdated.setRoomType(latesthotelDetails.getRoom());
+                // hotelToBeUpdated.setRoomType(latesthotelDetails.getRoom());
                 hotelToBeUpdated.setPricePerDay(latesthotelDetails.getPrice());
                 hotelToBeUpdated.setNumberOfRooms(latesthotelDetails.getNumberOfRoom());
                 hotelDBRepo.save(hotelToBeUpdated);
