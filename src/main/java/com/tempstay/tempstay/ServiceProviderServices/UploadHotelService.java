@@ -32,7 +32,7 @@ public class UploadHotelService {
 
     public ResponseEntity<ResponseMessage> uploadHotelsInfoService(List<PriceHotelType> pricePerType, String token,
             String role) {
-        // return ResponseEntity.ok().body(responseMessage);
+       
         try {
             String email = authService.verifyToken(token);
             String hotelownID = serviceProviderRepository.findByEmail(email).getId().toString();

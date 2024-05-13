@@ -255,7 +255,7 @@ public class MainController {
     }
 
     @GetMapping("getallhotels")
-    public List<HotelsDB> getAllHotels(@RequestHeader String token, @RequestHeader String role) {
+    public List<ServiceProviderModel> getAllHotels(@RequestHeader String token, @RequestHeader String role) {
         String email = authService.verifyToken(token);
 
         UserModel user = userRepository.findByEmail(email);
@@ -264,7 +264,7 @@ public class MainController {
             return Collections.emptyList(); // Returning an empty list
         }
 
-        List<HotelsDB> allHotels = hotelDBRepo.findAll();
+        List<ServiceProviderModel> allHotels = serviceProviderRepository.findAll();
         return allHotels;
     }
 
