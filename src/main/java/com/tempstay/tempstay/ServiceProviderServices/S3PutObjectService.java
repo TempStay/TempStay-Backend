@@ -43,7 +43,7 @@ public class S3PutObjectService {
         }
     }
 
-    public ResponseEntity<ResponseMessage> preSignedURLService(String spId, String key) {
+    public ResponseEntity<ResponseMessage> preSignedURLService(String hotelownId, String key) {
         S3Presigner s3Client = S3Presigner.builder().region(S3Data.region).build();
 
         try {
