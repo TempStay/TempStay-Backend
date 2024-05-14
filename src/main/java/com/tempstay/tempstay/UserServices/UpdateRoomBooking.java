@@ -85,12 +85,12 @@ public class UpdateRoomBooking {
             hotelOb.setNumberOfRooms(updatedNumberOfRooms);
 
             hotelDBRepo.save(hotelOb);
-            int noOfRooms = bookRoomRepo.findById(bookRoomOb.getRoomBookingId()).get().getNumberOfRooms();
+            // int noOfRooms = bookRoomRepo.findById(bookRoomOb.getRoomBookingId()).get().getNumberOfRooms();
 
             HotelsDB hotelFromDB = hotelDBRepo
                     .findByRoomId(bookRoomRepo.findById(bookRoomOb.getRoomBookingId()).get().getRoomId());
 
-            int updated_no_of_rooms = noOfRooms + hotelFromDB.getNumberOfRooms();
+            int updated_no_of_rooms = bookRoomOb.getNumberOfRooms() + hotelFromDB.getNumberOfRooms();
 
             
             hotelFromDB.setNumberOfRooms(updated_no_of_rooms);

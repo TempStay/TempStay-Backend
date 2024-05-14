@@ -270,18 +270,29 @@ public class MainController {
 
     @GetMapping("getdetailsbyhotelownid")
     public List<HotelsDB> gethotelsdetails(@RequestHeader String hotelownId) {
-        
+
         List<HotelsDB> hotels = hotelDBRepo.findByHotelownId(UUID.fromString(hotelownId));
         return hotels;
 
     }
+
     @GetMapping("getdetailsbyhotelownidandroomtype")
-    public HotelsDB gethotelsdetailsbyhotelownidandromtype(@RequestHeader String hotelownId,@RequestHeader String roomType) {
-        
-        HotelsDB hotels = hotelDBRepo.findByHotelownIdAndRoomType(UUID.fromString(hotelownId),roomType);
+    public HotelsDB gethotelsdetailsbyhotelownidandromtype(@RequestHeader String hotelownId,
+            @RequestHeader String roomType) {
+
+        HotelsDB hotels = hotelDBRepo.findByHotelownIdAndRoomType(UUID.fromString(hotelownId), roomType);
         return hotels;
 
+    }
 
+    @GetMapping("getroomidbyhotelownidandroomtype")
+    public String getroomidbyroomtypeandhotelid(@RequestHeader String hotelownId, @RequestHeader String roomType) {
 
-}
+        HotelsDB hotels = hotelDBRepo.findByHotelownIdAndRoomType(UUID.fromString(hotelownId), roomType);
+        String roomid = hotels.getRoomId().toString();
+
+        return roomid;
+
+    }
+
 }
