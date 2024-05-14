@@ -37,4 +37,6 @@ public class BookRoomHOModel {
 
     private int priceToBePaid;
 
+    private String hotelName;
+
 }

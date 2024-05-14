@@ -2,6 +2,7 @@ package com.tempstay.tempstay.UserServices;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,9 +11,11 @@ import org.springframework.stereotype.Service;
 import com.tempstay.tempstay.Models.BookRoomHOModel;
 import com.tempstay.tempstay.Models.HotelsDB;
 import com.tempstay.tempstay.Models.ResponseMessage;
+import com.tempstay.tempstay.Models.ServiceProviderModel;
 import com.tempstay.tempstay.Models.UserModel;
 import com.tempstay.tempstay.Repository.BookRoomRepo;
 import com.tempstay.tempstay.Repository.HotelDBRepo;
+import com.tempstay.tempstay.Repository.ServiceProviderRepository;
 import com.tempstay.tempstay.Repository.UserRepository;
 
 @Service
@@ -29,7 +32,8 @@ public class BookRoomService {
     @Autowired
     private UserRepository userRepository;
 
-   
+    @Autowired
+    private ServiceProviderRepository serviceProviderRepository;
 
     @Autowired
     private HotelDBRepo hotelDBRepo;
@@ -109,6 +113,13 @@ public class BookRoomService {
 
                     bookRoomHOModel.setPriceToBePaid(total_price);
 
+                    Optional<ServiceProviderModel> serviceProviderObject = serviceProviderRepository
+                            .findById(bookRoomHOModelReq.getHotelownId());
+
+                            String hotelName=serviceProviderObject.get().getHotelName();
+
+                            bookRoomHOModel.setHotelName(hotelName);
+
                     bookRoomRepo.save(bookRoomHOModel);
 
                     // Update the number of available rooms
@@ -129,11 +140,11 @@ public class BookRoomService {
                 return messageFromCheckRoom;
             }
         } catch (Exception e) {
-           
+
             responseMessage.setSuccess(false);
             responseMessage.setMessage("An error occurred while processing your request.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMessage);
         }
-}
+    }
 
 }
