@@ -46,7 +46,7 @@ public class UpdateRoomBooking {
             }
 
             ResponseEntity<ResponseMessage> messageFromCheckRoom = bookRoomService.checkRoom(
-                    changeBookingData.getRoomId(),
+                bookRoomOb.getRoomId(),
                     bookRoomOb.getHotelownId());
 
             if (!messageFromCheckRoom.getBody().getSuccess()) {
@@ -70,7 +70,7 @@ public class UpdateRoomBooking {
 
            
 
-            HotelsDB hotelOb = hotelDBRepo.findByRoomId(changeBookingData.getRoomId());
+            HotelsDB hotelOb = hotelDBRepo.findByRoomId(bookRoomOb.getRoomId());
 
             int totalPrice = (int) (hotelOb.getPricePerDay() * daysDifference * changeBookingData.getNumberOfRooms());
 
@@ -87,18 +87,18 @@ public class UpdateRoomBooking {
             hotelDBRepo.save(hotelOb);
           
 
-            HotelsDB hotelFromDB = hotelDBRepo
-                    .findByRoomId(bookRoomRepo.findById(bookRoomOb.getRoomBookingId()).get().getRoomId());
+            // HotelsDB hotelFromDB = hotelDBRepo
+            //         .findByRoomId(bookRoomRepo.findById(bookRoomOb.getRoomBookingId()).get().getRoomId());
 
-            int updated_no_of_rooms = bookRoomOb.getNumberOfRooms() + hotelFromDB.getNumberOfRooms();
+            // int updated_no_of_rooms = bookRoomOb.getNumberOfRooms() + hotelFromDB.getNumberOfRooms();
 
            
 
-            hotelFromDB.setNumberOfRooms(updated_no_of_rooms);
+            // hotelFromDB.setNumberOfRooms(updated_no_of_rooms);
 
-            hotelDBRepo.save(hotelFromDB);
+            // hotelDBRepo.save(hotelFromDB);
 
-            bookRoomOb.setRoomId(changeBookingData.getRoomId());
+            bookRoomOb.setRoomId(bookRoomOb.getRoomId());
 
             bookRoomOb.setNumberOfRooms(changeBookingData.getNumberOfRooms());
 

@@ -32,6 +32,7 @@ import com.tempstay.tempstay.Models.UserModel;
 import com.tempstay.tempstay.RatingService.HotelRating;
 import com.tempstay.tempstay.Repository.BookRoomRepo;
 import com.tempstay.tempstay.Repository.HotelDBRepo;
+import com.tempstay.tempstay.Repository.ImagesDBRepo;
 import com.tempstay.tempstay.Repository.ServiceProviderRepository;
 import com.tempstay.tempstay.Repository.UserRepository;
 import com.tempstay.tempstay.SearchFunction.SearchByAddressAndHotelName;
@@ -104,6 +105,9 @@ public class MainController {
 
     @Autowired
     private FetchHotelImages fetchImagesService;
+
+    @Autowired
+    private ImagesDBRepo imagesDBRepo;
 
     @PostMapping("adduser")
     public ResponseEntity<Object> addUser(@Valid @RequestBody Object userOrService, BindingResult bindingResult,
@@ -292,6 +296,17 @@ public class MainController {
         String roomid = hotels.getRoomId().toString();
 
         return roomid;
+
+    }
+
+
+    @GetMapping("getimagesbyhotelid")
+    public List<ImagesDB> getimagesbyhotelid(@RequestHeader String hotelownId) {
+
+        
+        List<ImagesDB> images = imagesDBRepo.findByhotelownId(UUID.fromString(hotelownId));
+
+        return images;
 
     }
 

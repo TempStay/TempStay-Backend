@@ -13,7 +13,7 @@ import lombok.Data;
 public class ChangeBookingData {
     
 
-    private UUID roomId;
+    // private UUID roomId;
 
     private Date checkinDate;
 
