@@ -68,7 +68,7 @@ public class UpdateRoomBooking {
 
             bookRoomOb.setNumberOfDaysToStay((int) daysDifference);
 
-            bookRoomOb.setNumberOfRooms(changeBookingData.getNumberOfRooms());
+           
 
             HotelsDB hotelOb = hotelDBRepo.findByRoomId(changeBookingData.getRoomId());
 
@@ -85,19 +85,22 @@ public class UpdateRoomBooking {
             hotelOb.setNumberOfRooms(updatedNumberOfRooms);
 
             hotelDBRepo.save(hotelOb);
-            // int noOfRooms = bookRoomRepo.findById(bookRoomOb.getRoomBookingId()).get().getNumberOfRooms();
+          
 
             HotelsDB hotelFromDB = hotelDBRepo
                     .findByRoomId(bookRoomRepo.findById(bookRoomOb.getRoomBookingId()).get().getRoomId());
 
             int updated_no_of_rooms = bookRoomOb.getNumberOfRooms() + hotelFromDB.getNumberOfRooms();
 
-            
+           
+
             hotelFromDB.setNumberOfRooms(updated_no_of_rooms);
 
             hotelDBRepo.save(hotelFromDB);
 
             bookRoomOb.setRoomId(changeBookingData.getRoomId());
+
+            bookRoomOb.setNumberOfRooms(changeBookingData.getNumberOfRooms());
 
             bookRoomRepo.save(bookRoomOb);
 
