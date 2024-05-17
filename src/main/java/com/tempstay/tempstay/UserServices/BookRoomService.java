@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.tempstay.tempstay.Models.BookRoomHOModel;
 import com.tempstay.tempstay.Models.HotelsDB;
-import com.tempstay.tempstay.Models.ResponseMessage;
+import com.tempstay.tempstay.Models.ResponseBooking;
 import com.tempstay.tempstay.Models.ServiceProviderModel;
 import com.tempstay.tempstay.Models.UserModel;
 import com.tempstay.tempstay.Repository.BookRoomRepo;
@@ -20,8 +20,7 @@ import com.tempstay.tempstay.Repository.UserRepository;
 
 @Service
 public class BookRoomService {
-    @Autowired
-    private ResponseMessage responseMessage;
+   
 
     @Autowired
     private BookRoomRepo bookRoomRepo;
@@ -36,9 +35,12 @@ public class BookRoomService {
     private ServiceProviderRepository serviceProviderRepository;
 
     @Autowired
+    private ResponseBooking responseBooking;
+
+    @Autowired
     private HotelDBRepo hotelDBRepo;
 
-    public ResponseEntity<ResponseMessage> checkRoom(UUID roomId, UUID hotelownId) {
+    public ResponseEntity<ResponseBooking> checkRoom(UUID roomId, UUID hotelownId) {
         try {
             HotelsDB hotel_ob = hotelDBRepo.findByHotelownIdAndRoomId(hotelownId, roomId);
 
@@ -46,30 +48,33 @@ public class BookRoomService {
                 int no_of_rooms = hotel_ob.getNumberOfRooms();
 
                 if (no_of_rooms > 0) {
-                    responseMessage.setSuccess(true);
-                    responseMessage.setMessage("Room Empty");
+                    responseBooking.setSuccess(true);
+                    responseBooking.setMessage("Room Empty");
+                    
                 } else {
-                    responseMessage.setSuccess(false);
-                    responseMessage.setMessage("No Rooms Available");
+                    responseBooking.setSuccess(false);
+                    responseBooking.setMessage("No Rooms Available");
+                    responseBooking.setPriceToBePaid(0);
                 }
             } else {
-                responseMessage.setSuccess(false);
-                responseMessage.setMessage("Enter valid roomId");
+                responseBooking.setSuccess(false);
+                responseBooking.setMessage("Enter valid roomId");
+                responseBooking.setPriceToBePaid(0);
             }
 
-            return ResponseEntity.ok().body(responseMessage);
+            return ResponseEntity.ok().body(responseBooking);
         } catch (Exception e) {
-            responseMessage.setSuccess(false);
-            responseMessage
+            responseBooking.setSuccess(false);
+            responseBooking
                     .setMessage("Internal Server Error inside BookRoomServce.java Method:checkRoom " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMessage);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseBooking);
         }
     }
 
-    public ResponseEntity<ResponseMessage> userRoomBookService(BookRoomHOModel bookRoomHOModelReq, String token,
+    public ResponseEntity<ResponseBooking> userRoomBookService(BookRoomHOModel bookRoomHOModelReq, String token,
             String role) {
         try {
-            ResponseEntity<ResponseMessage> messageFromCheckRoom = checkRoom(bookRoomHOModelReq.getRoomId(),
+            ResponseEntity<ResponseBooking> messageFromCheckRoom = checkRoom(bookRoomHOModelReq.getRoomId(),
                     bookRoomHOModelReq.getHotelownId());
 
             if (messageFromCheckRoom.getBody().getSuccess()) {
@@ -126,24 +131,28 @@ public class BookRoomService {
                     hotel_ob.setNumberOfRooms(availableRooms - bookRoomHOModelReq.getNumberOfRooms());
                     hotelDBRepo.save(hotel_ob);
 
-                    responseMessage.setSuccess(true);
-                    responseMessage.setMessage("Room booked.");
+                    responseBooking.setSuccess(true);
+                    responseBooking.setMessage("Room booked.");
+                    responseBooking.setPriceToBePaid(total_price);
 
-                    return ResponseEntity.ok().body(responseMessage);
+                    return ResponseEntity.ok().body(responseBooking);
                 } else {
                     // Not enough rooms available
-                    responseMessage.setSuccess(false);
-                    responseMessage.setMessage("Not enough rooms available.");
-                    return ResponseEntity.badRequest().body(responseMessage);
+                    responseBooking.setSuccess(false);
+                    responseBooking.setMessage("Not enough rooms available.");
+                    responseBooking.setPriceToBePaid(0);
+                    return ResponseEntity.badRequest().body(responseBooking);
+                    
                 }
             } else {
                 return messageFromCheckRoom;
             }
         } catch (Exception e) {
 
-            responseMessage.setSuccess(false);
-            responseMessage.setMessage("An error occurred while processing your request.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMessage);
+            responseBooking.setSuccess(false);
+            responseBooking.setMessage("An error occurred while processing your request.");
+            responseBooking.setPriceToBePaid(0);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseBooking);
         }
     }
 

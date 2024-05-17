@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import com.tempstay.tempstay.Models.BookRoomHOModel;
 import com.tempstay.tempstay.Models.ChangeBookingData;
 import com.tempstay.tempstay.Models.HotelsDB;
-import com.tempstay.tempstay.Models.ResponseMessage;
+import com.tempstay.tempstay.Models.ResponseBooking;
 import com.tempstay.tempstay.Repository.BookRoomRepo;
 import com.tempstay.tempstay.Repository.HotelDBRepo;
 
@@ -24,14 +24,16 @@ public class UpdateRoomBooking {
     @Autowired
     private HotelDBRepo hotelDBRepo;
 
-    @Autowired
-    private ResponseMessage responseMessage;
+  
 
     @Autowired
     private BookRoomService bookRoomService;
 
+    @Autowired
+    private ResponseBooking responseBooking;
 
-    public ResponseEntity<ResponseMessage> reScheduleRoomService(ChangeBookingData changeBookingData, String token,
+
+    public ResponseEntity<ResponseBooking> reScheduleRoomService(ChangeBookingData changeBookingData, String token,
     String role) {
 try {
     
@@ -40,12 +42,12 @@ try {
     
 
     if (bookRoomOb == null) {
-        responseMessage.setSuccess(false);
-        responseMessage.setMessage("Booking not found.");
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseMessage);
+        responseBooking.setSuccess(false);
+        responseBooking.setMessage("Booking not found.");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseBooking);
     }
 
-    ResponseEntity<ResponseMessage> messageFromCheckRoom = bookRoomService.checkRoom(
+    ResponseEntity<ResponseBooking> messageFromCheckRoom = bookRoomService.checkRoom(
         bookRoomOb.getRoomId(),
             bookRoomOb.getHotelownId());
 
@@ -63,9 +65,10 @@ try {
     if (numberOfRoomsDifference > 0) {
         int updatedNumberOfRooms = hotelOb.getNumberOfRooms() - numberOfRoomsDifference;
         if (updatedNumberOfRooms < 0) {
-            responseMessage.setSuccess(false);
-            responseMessage.setMessage("Insufficient rooms available.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
+            responseBooking.setSuccess(false);
+            responseBooking.setMessage("Insufficient rooms available.");
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBooking);
         }
         hotelOb.setNumberOfRooms(updatedNumberOfRooms);
     }
@@ -88,15 +91,16 @@ try {
     bookRoomRepo.save(bookRoomOb);
     hotelDBRepo.save(hotelOb);
 
-    responseMessage.setSuccess(true);
-    responseMessage.setMessage("Updated Room Successfully booked.");
-    return ResponseEntity.ok().body(responseMessage);
+    responseBooking.setSuccess(true);
+    responseBooking.setMessage("Updated Room Successfully booked.");
+    responseBooking.setPriceToBePaid(totalPrice);
+    return ResponseEntity.ok().body(responseBooking);
 } catch (Exception e) {
     
-    responseMessage.setSuccess(false);
-    responseMessage.setMessage(
+    responseBooking.setSuccess(false);
+    responseBooking.setMessage(
             "Internal Server Error inside BookSlotServce.java Method: userBookSLotService " + e.getMessage());
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMessage);
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseBooking);
 }
 }
 

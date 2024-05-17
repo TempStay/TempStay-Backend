@@ -25,6 +25,7 @@ import com.tempstay.tempstay.Models.HotelsDB;
 import com.tempstay.tempstay.Models.ImagesDB;
 import com.tempstay.tempstay.Models.LoginModel;
 import com.tempstay.tempstay.Models.PriceHotelType;
+import com.tempstay.tempstay.Models.ResponseBooking;
 import com.tempstay.tempstay.Models.ResponseMessage;
 import com.tempstay.tempstay.Models.ServiceProviderModel;
 import com.tempstay.tempstay.Models.UpdateUserDetails;
@@ -190,13 +191,13 @@ public class MainController {
     }
 
     @PostMapping("bookroom")
-    public ResponseEntity<ResponseMessage> bookRoomtByUser(@RequestBody BookRoomHOModel bookRoomHOModel,
+    public ResponseEntity<ResponseBooking> bookRoomtByUser(@RequestBody BookRoomHOModel bookRoomHOModel,
             @RequestHeader String token, @RequestHeader String role) {
         return bookRoomService.userRoomBookService(bookRoomHOModel, token, role);
     }
 
     @PostMapping("checkroom")
-    public ResponseEntity<ResponseMessage> checkingfunc(@RequestBody BookRoomHOModel bookRoomHOModelReq) {
+    public ResponseEntity<ResponseBooking> checkingfunc(@RequestBody BookRoomHOModel bookRoomHOModelReq) {
 
         return bookRoomService.checkRoom(bookRoomHOModelReq.getRoomId(), bookRoomHOModelReq.getHotelownId());
 
@@ -222,7 +223,7 @@ public class MainController {
     }
 
     @PutMapping("updateroombooking")
-    public ResponseEntity<ResponseMessage> updateroom(@RequestHeader String token, @RequestHeader String role,
+    public ResponseEntity<ResponseBooking> updateroom(@RequestHeader String token, @RequestHeader String role,
             @RequestBody ChangeBookingData changeBookingData) {
         return updateRoomBooking.reScheduleRoomService(changeBookingData, token, role);
     }
