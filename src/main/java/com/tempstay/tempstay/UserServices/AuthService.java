@@ -1,5 +1,4 @@
 package com.tempstay.tempstay.UserServices;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
@@ -12,8 +11,7 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class AuthService {
     
-    @Value("${SECRET_KEY}")
-    private String secretKey;
+    private String secretKey=System.getenv("SECRET_KEY");
 
     public String generateToken(String email) {
         try {
