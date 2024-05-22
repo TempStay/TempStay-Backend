@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  auth-service:
+    image: tempstayimage
+    restart: always
+    ports:
+      - 9030:9030
+    environment:
+      - DATABASE_URL=jdbc:mysql://172.31.13.41:3306/tempstay
+      - USERNAME=root
+      - PASSWORD=root
+      - ADMIN_USERNAME=mgtarun7@gmail.com
+      - ADMIN_PASSWORD=eced ugad zaui lrcw
+      - SECRET_KEY=jknfjejfjsebfjskefjksefjsekbfsekjfjfsjefnsejfnsefjksenfsekfnsfnksfuhjyuhyhy

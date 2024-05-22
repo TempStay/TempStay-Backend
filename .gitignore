@@ -12,6 +12,8 @@ target/
 .springBeans
 .sts4-cache
 .env
+dock-compose.yml
+Dockerfile 1
 ### IntelliJ IDEA ###
 .idea
 *.iws
