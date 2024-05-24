@@ -8,10 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.tempstay.tempstay.Models.BookRoomHOModel;
-import com.tempstay.tempstay.Models.HotelsDB;
 import com.tempstay.tempstay.Models.ResponseMessage;
 import com.tempstay.tempstay.Repository.BookRoomRepo;
-import com.tempstay.tempstay.Repository.HotelDBRepo;
 
 @Service
 public class DeleteBooking {
@@ -25,8 +23,7 @@ public class DeleteBooking {
     @Autowired
     private ResponseMessage responseMessage;
 
-    @Autowired
-    private HotelDBRepo hotelDBRepo;
+   
 
     public ResponseEntity<ResponseMessage> deletebooking(String token, UUID bookingId, String role) {
 
@@ -41,19 +38,18 @@ public class DeleteBooking {
                 responseMessage.setMessage("booking not found.");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseMessage);
             } else {
-                int noOfRooms = bookRoomRepo.findById(bookingId).get().getNumberOfRooms();
+                // int noOfRooms = bookRoomRepo.findById(bookingId).get().getNumberOfRooms();
 
-                HotelsDB hotelFromDB = hotelDBRepo.findByRoomId(bookRoomRepo.findById(bookingId).get().getRoomId());
+               
 
 
-
-                int updated_no_of_rooms = noOfRooms + hotelFromDB.getNumberOfRooms();
+                // int updated_no_of_rooms = noOfRooms + hotelFromDB.getNumberOfRooms();
 
                 
 
-                hotelFromDB.setNumberOfRooms(updated_no_of_rooms);
+                // hotelFromDB.setNumberOfRooms(updated_no_of_rooms);
 
-                hotelDBRepo.save(hotelFromDB);
+               
                 bookRoomRepo.deleteById(bookingId);
 
                 responseMessage.setSuccess(true);

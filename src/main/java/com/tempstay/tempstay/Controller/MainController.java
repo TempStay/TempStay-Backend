@@ -199,7 +199,7 @@ public class MainController {
     @PostMapping("checkroom")
     public ResponseEntity<ResponseBooking> checkingfunc(@RequestBody BookRoomHOModel bookRoomHOModelReq) {
 
-        return bookRoomService.checkRoom(bookRoomHOModelReq.getRoomId(), bookRoomHOModelReq.getHotelownId());
+        return bookRoomService.checkRoom(bookRoomHOModelReq.getRoomId(), bookRoomHOModelReq.getHotelownId(),bookRoomHOModelReq.getCheckinDate(),bookRoomHOModelReq.getCheckoutDate());
 
     }
 

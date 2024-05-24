@@ -11,4 +11,5 @@ public class ResponseBooking {
     private String message;
     private String token;
     private int priceToBePaid;
+    private int availableRooms;
 }
