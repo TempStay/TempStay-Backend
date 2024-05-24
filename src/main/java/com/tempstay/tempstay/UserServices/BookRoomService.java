@@ -58,7 +58,7 @@ public class BookRoomService {
                     BookRoomHOModel element = iterator.next();
                   
                     availableRooms=availableRooms-element.getNumberOfRooms();
-                    
+                    System.out.println(element.getNumberOfRooms());
                 }
               System.out.println("if block"+availableRooms);
                
@@ -107,36 +107,36 @@ public class BookRoomService {
         }
     }
 
-    public ResponseEntity<ResponseBooking> checkRoom(UUID roomId, UUID hotelownId) {
-        try {
-            HotelsDB hotel_ob = hotelDBRepo.findByHotelownIdAndRoomId(hotelownId, roomId);
+    // public ResponseEntity<ResponseBooking> checkRoom(UUID roomId, UUID hotelownId) {
+    //     try {
+    //         HotelsDB hotel_ob = hotelDBRepo.findByHotelownIdAndRoomId(hotelownId, roomId);
 
-            if (hotel_ob != null) {
-                int no_of_rooms = hotel_ob.getNumberOfRooms();
+    //         if (hotel_ob != null) {
+    //             int no_of_rooms = hotel_ob.getNumberOfRooms();
 
-                if (no_of_rooms > 0) {
-                    responseBooking.setSuccess(true);
-                    responseBooking.setMessage("Room Empty");
+    //             if (no_of_rooms > 0) {
+    //                 responseBooking.setSuccess(true);
+    //                 responseBooking.setMessage("Room Empty");
 
-                } else {
-                    responseBooking.setSuccess(false);
-                    responseBooking.setMessage("No Rooms Available");
-                    responseBooking.setPriceToBePaid(0);
-                }
-            } else {
-                responseBooking.setSuccess(false);
-                responseBooking.setMessage("Enter valid roomId");
-                responseBooking.setPriceToBePaid(0);
-            }
+    //             } else {
+    //                 responseBooking.setSuccess(false);
+    //                 responseBooking.setMessage("No Rooms Available");
+    //                 responseBooking.setPriceToBePaid(0);
+    //             }
+    //         } else {
+    //             responseBooking.setSuccess(false);
+    //             responseBooking.setMessage("Enter valid roomId");
+    //             responseBooking.setPriceToBePaid(0);
+    //         }
 
-            return ResponseEntity.ok().body(responseBooking);
-        } catch (Exception e) {
-            responseBooking.setSuccess(false);
-            responseBooking
-                    .setMessage("Internal Server Error inside BookRoomServce.java Method:checkRoom " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseBooking);
-        }
-    }
+    //         return ResponseEntity.ok().body(responseBooking);
+    //     } catch (Exception e) {
+    //         responseBooking.setSuccess(false);
+    //         responseBooking
+    //                 .setMessage("Internal Server Error inside BookRoomServce.java Method:checkRoom " + e.getMessage());
+    //         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseBooking);
+    //     }
+    // }
 
     public ResponseEntity<ResponseBooking> userRoomBookService(BookRoomHOModel bookRoomHOModelReq, String token,
             String role) {

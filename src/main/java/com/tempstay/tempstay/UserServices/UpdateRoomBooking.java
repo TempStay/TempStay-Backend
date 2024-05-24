@@ -24,84 +24,69 @@ public class UpdateRoomBooking {
     @Autowired
     private HotelDBRepo hotelDBRepo;
 
-  
-
     @Autowired
     private BookRoomService bookRoomService;
 
     @Autowired
     private ResponseBooking responseBooking;
 
-
     public ResponseEntity<ResponseBooking> reScheduleRoomService(ChangeBookingData changeBookingData, String token,
-    String role) {
-try {
-    
-    BookRoomHOModel bookRoomOb = bookRoomRepo.findByRoomBookingId(changeBookingData.getRoomBookingId());
+            String role) {
+        try {
 
-    
+            BookRoomHOModel bookRoomOb = bookRoomRepo.findByRoomBookingId(changeBookingData.getRoomBookingId());
 
-    if (bookRoomOb == null) {
-        responseBooking.setSuccess(false);
-        responseBooking.setMessage("Booking not found.");
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseBooking);
-    }
+            if (bookRoomOb == null) {
+                responseBooking.setSuccess(false);
+                responseBooking.setMessage("Booking not found.");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseBooking);
+            }
 
-    ResponseEntity<ResponseBooking> messageFromCheckRoom = bookRoomService.checkRoom(
-        bookRoomOb.getRoomId(),
-            bookRoomOb.getHotelownId());
+            ResponseEntity<ResponseBooking> messageFromCheckRoom = bookRoomService.checkRoom(
+                    bookRoomOb.getRoomId(),
+                    bookRoomOb.getHotelownId(), changeBookingData.getCheckinDate(),
+                    changeBookingData.getCheckoutDate());
 
-    if (!messageFromCheckRoom.getBody().getSuccess()) {
-        return messageFromCheckRoom;
-    }
+            if (!messageFromCheckRoom.getBody().getSuccess()) {
+                return messageFromCheckRoom;
+            }
+            int availableRooms = messageFromCheckRoom.getBody().getAvailableRooms();
+            
+            if (Math.abs(changeBookingData.getNumberOfRooms()-bookRoomOb.getNumberOfRooms()) > availableRooms) {
+                responseBooking.setSuccess(false);
+                responseBooking.setMessage("Insufficient rooms available.");
+                responseBooking.setAvailableRooms(availableRooms);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBooking);
 
-    // Calculate the difference in the number of rooms requested
-    int numberOfRoomsDifference = changeBookingData.getNumberOfRooms() - bookRoomOb.getNumberOfRooms();
+            } else {
+                bookRoomOb.setCheckinDate(changeBookingData.getCheckinDate());
+                bookRoomOb.setCheckoutDate(changeBookingData.getCheckoutDate());
+                bookRoomOb.setNumberOfRooms(changeBookingData.getNumberOfRooms());
+                LocalDate checkOut = changeBookingData.getCheckoutDate().toLocalDate();
+                LocalDate checkIn = changeBookingData.getCheckinDate().toLocalDate();
+                long daysDifference = ChronoUnit.DAYS.between(checkIn, checkOut);
+                bookRoomOb.setNumberOfDaysToStay((int) daysDifference);
+                HotelsDB hotelOb = hotelDBRepo.findByHotelownIdAndRoomId(bookRoomOb.getHotelownId(),
+                        bookRoomOb.getRoomId());
+                int totalPrice = (int) (hotelOb.getPricePerDay() * daysDifference
+                        * changeBookingData.getNumberOfRooms());
+                bookRoomOb.setPriceToBePaid(totalPrice);
+                bookRoomRepo.save(bookRoomOb);
+                responseBooking.setSuccess(true);
+                responseBooking.setMessage("Updated Room Successfully booked.");
+                responseBooking.setPriceToBePaid(totalPrice);
+                responseBooking.setAvailableRooms(hotelOb.getNumberOfRooms()-changeBookingData.getNumberOfRooms());
+                return ResponseEntity.ok().body(responseBooking);
 
-    // Fetch hotel details
-    HotelsDB hotelOb = hotelDBRepo.findByRoomId(bookRoomOb.getRoomId());
+            }
 
-    // If the difference is positive, it means the user wants to book more rooms
-    if (numberOfRoomsDifference > 0) {
-        int updatedNumberOfRooms = hotelOb.getNumberOfRooms() - numberOfRoomsDifference;
-        if (updatedNumberOfRooms < 0) {
+        } catch (Exception e) {
+
             responseBooking.setSuccess(false);
-            responseBooking.setMessage("Insufficient rooms available.");
-
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBooking);
+            responseBooking.setMessage(
+                    "Internal Server Error inside BookSlotServce.java Method: userBookSLotService " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseBooking);
         }
-        hotelOb.setNumberOfRooms(updatedNumberOfRooms);
     }
-    // If the difference is negative, it means the user wants to reduce the booked rooms
-    else if (numberOfRoomsDifference < 0) {
-        hotelOb.setNumberOfRooms(hotelOb.getNumberOfRooms() - numberOfRoomsDifference);
-    }
-    // If the difference is zero, no change is needed
-
-    // Update booking details
-    bookRoomOb.setCheckinDate(changeBookingData.getCheckinDate());
-    bookRoomOb.setCheckoutDate(changeBookingData.getCheckoutDate());
-    bookRoomOb.setNumberOfRooms(changeBookingData.getNumberOfRooms());
-    LocalDate checkOut = changeBookingData.getCheckoutDate().toLocalDate();
-    LocalDate checkIn = changeBookingData.getCheckinDate().toLocalDate();
-    long daysDifference = ChronoUnit.DAYS.between(checkIn, checkOut);
-    bookRoomOb.setNumberOfDaysToStay((int) daysDifference);
-    int totalPrice = (int) (hotelOb.getPricePerDay() * daysDifference * changeBookingData.getNumberOfRooms());
-    bookRoomOb.setPriceToBePaid(totalPrice);
-    bookRoomRepo.save(bookRoomOb);
-    hotelDBRepo.save(hotelOb);
-
-    responseBooking.setSuccess(true);
-    responseBooking.setMessage("Updated Room Successfully booked.");
-    responseBooking.setPriceToBePaid(totalPrice);
-    return ResponseEntity.ok().body(responseBooking);
-} catch (Exception e) {
-    
-    responseBooking.setSuccess(false);
-    responseBooking.setMessage(
-            "Internal Server Error inside BookSlotServce.java Method: userBookSLotService " + e.getMessage());
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseBooking);
-}
-}
 
 }
