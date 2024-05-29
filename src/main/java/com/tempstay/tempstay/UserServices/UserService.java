@@ -318,7 +318,7 @@ public class UserService {
                     otpForForgotPassword.setOtp(otp);
                     otpForForgotPassword.setUseCase("forgotpassword");
                     otpForForgotPassword.setCreatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
-
+                    otpRepo.save(otpForForgotPassword);
                     String response = emailService.sendSimpleMail(email,
                             "Your OTP for resetting your password is " + Integer.toString(otp)
                                     + ". It is valid only for 5 minutes.",
