@@ -49,15 +49,15 @@ public class UpdateRoomBooking {
 
             
             int availableRooms = messageFromCheckRoom.getBody().getAvailableRooms();
-            
+            if(changeBookingData.getNumberOfRooms()<bookRoomOb.getNumberOfRooms()){
+                bookRoomOb.setNumberOfRooms(changeBookingData.getNumberOfRooms());
+                return reScheduleRoomService(changeBookingData, token, role);
+            }
             if (!messageFromCheckRoom.getBody().getSuccess()) {
-                if(changeBookingData.getNumberOfRooms()<bookRoomOb.getNumberOfRooms()){
-                    bookRoomOb.setNumberOfRooms(changeBookingData.getNumberOfRooms());
-                    return reScheduleRoomService(changeBookingData, token, role);
-                }
-                else {
+               
+               
                     return messageFromCheckRoom;
-                }
+                
             }
             if (Math.abs(changeBookingData.getNumberOfRooms()-bookRoomOb.getNumberOfRooms()) > availableRooms) {
                 responseBooking.setSuccess(false);
