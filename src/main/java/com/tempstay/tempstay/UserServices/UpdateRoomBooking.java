@@ -47,11 +47,18 @@ public class UpdateRoomBooking {
                     bookRoomOb.getHotelownId(), changeBookingData.getCheckinDate(),
                     changeBookingData.getCheckoutDate());
 
-            if (!messageFromCheckRoom.getBody().getSuccess()) {
-                return messageFromCheckRoom;
-            }
+            
             int availableRooms = messageFromCheckRoom.getBody().getAvailableRooms();
             
+            if (!messageFromCheckRoom.getBody().getSuccess()) {
+                if(changeBookingData.getNumberOfRooms()<bookRoomOb.getNumberOfRooms()){
+                    bookRoomOb.setNumberOfRooms(changeBookingData.getNumberOfRooms());
+                    return reScheduleRoomService(changeBookingData, token, role);
+                }
+                else {
+                    return messageFromCheckRoom;
+                }
+            }
             if (Math.abs(changeBookingData.getNumberOfRooms()-bookRoomOb.getNumberOfRooms()) > availableRooms) {
                 responseBooking.setSuccess(false);
                 responseBooking.setMessage("Insufficient rooms available.");
@@ -75,7 +82,11 @@ public class UpdateRoomBooking {
                 responseBooking.setSuccess(true);
                 responseBooking.setMessage("Updated Room Successfully booked.");
                 responseBooking.setPriceToBePaid(totalPrice);
-                responseBooking.setAvailableRooms(hotelOb.getNumberOfRooms()-changeBookingData.getNumberOfRooms());
+                ResponseEntity<ResponseBooking> messageupdated = bookRoomService.checkRoom(
+                    bookRoomOb.getRoomId(),
+                    bookRoomOb.getHotelownId(), changeBookingData.getCheckinDate(),
+                    changeBookingData.getCheckoutDate());
+                responseBooking.setAvailableRooms(messageupdated.getBody().getAvailableRooms());
                 return ResponseEntity.ok().body(responseBooking);
 
             }
