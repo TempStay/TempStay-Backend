@@ -51,8 +51,14 @@ public class UpdateRoomBooking {
             int availableRooms = messageFromCheckRoom.getBody().getAvailableRooms();
             if(changeBookingData.getNumberOfRooms()<bookRoomOb.getNumberOfRooms()){
                 bookRoomOb.setNumberOfRooms(changeBookingData.getNumberOfRooms());
+                System.out.println(!messageFromCheckRoom.getBody().getSuccess());
                 return reScheduleRoomService(changeBookingData, token, role);
             }
+            
+                                                                                                                                           
+            
+            
+            
             if (!messageFromCheckRoom.getBody().getSuccess()) {
                
                
